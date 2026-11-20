@@ -253,7 +253,6 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
         
         body {
@@ -344,9 +343,7 @@
             border: 1px solid var(--md-sys-color-outline-variant);
             width: 100%; min-width: 0;
         }
-        @media (min-width: 640px) {
-            .search-card { padding: 18px; gap: 12px; }
-        }
+        @media (min-width: 640px) { .search-card { padding: 18px; gap: 12px; } }
 
         .location-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; min-width: 0; }
         .location-pill {
@@ -408,7 +405,7 @@
         }
         .chip.cat-chip { background-color: var(--md-sys-color-surface); }
 
-        /* --- EMPTY HOME STATE (MD3 İPUCU & KARŞILAMA) --- */
+        /* --- EMPTY HOME STATE --- */
         .empty-home-state {
             display: none; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; padding: 34px 18px; margin: 8px 0;
@@ -421,18 +418,12 @@
             width: 72px; height: 72px; border-radius: 24px;
             background-color: var(--md-sys-color-primary-container);
             color: var(--md-sys-color-on-primary-container);
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 4px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 4px;
         }
         .empty-icon-circle .material-symbols-rounded { font-size: 38px; }
         .empty-home-title { font-size: 18px; font-weight: 600; color: var(--md-sys-color-on-surface); }
-        .empty-home-desc {
-            font-size: 13px; color: var(--md-sys-color-on-surface-variant);
-            max-width: 440px; line-height: 1.55;
-        }
-        .empty-tips-row {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px;
-        }
+        .empty-home-desc { font-size: 13px; color: var(--md-sys-color-on-surface-variant); max-width: 440px; line-height: 1.55; }
+        .empty-tips-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
         .empty-tip-pill {
             display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500;
             padding: 8px 14px; border-radius: 99px; border: 1px solid var(--md-sys-color-outline-variant);
@@ -463,35 +454,25 @@
         .m3-select {
             background-color: var(--md-sys-color-surface-container-high);
             color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: 10px; padding: 7px 10px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
-            max-width: 100%;
+            border-radius: 10px; padding: 7px 10px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; max-width: 100%;
         }
 
-        .results-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px;
-            width: 100%; min-width: 0;
-        }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; width: 100%; min-width: 0; }
         .product-grid-card {
             background-color: var(--md-sys-color-surface-container);
             border: 1px solid var(--md-sys-color-outline-variant);
             border-radius: var(--border-radius-medium); padding: 12px;
             display: flex; flex-direction: column; gap: 10px; cursor: pointer;
-            transition: var(--transition-standard); position: relative; overflow: hidden;
-            min-width: 0; width: 100%;
+            transition: var(--transition-standard); position: relative; overflow: hidden; min-width: 0; width: 100%;
         }
-        .product-grid-card:hover {
-            transform: translateY(-2px);
-            background-color: var(--md-sys-color-surface-container-high);
-            border-color: var(--md-sys-color-primary);
-        }
+        .product-grid-card:hover { transform: translateY(-2px); background-color: var(--md-sys-color-surface-container-high); border-color: var(--md-sys-color-primary); }
         .product-grid-card.pg-boycott { background-color: #FFF0EE; border-color: rgba(186, 26, 26, 0.35); }
         [data-theme="dark"] .product-grid-card.pg-boycott { background-color: #381414; border-color: rgba(255, 180, 171, 0.3); }
         .product-grid-card.pg-safe { background-color: #EFFBF4; border-color: rgba(0, 108, 81, 0.3); }
         [data-theme="dark"] .product-grid-card.pg-safe { background-color: #0E2B1E; border-color: rgba(95, 219, 180, 0.25); }
 
         .pg-corner-badge {
-            position: absolute; top: 0; right: 0;
-            padding: 3px 9px 4px 10px;
+            position: absolute; top: 0; right: 0; padding: 3px 9px 4px 10px;
             border-radius: 0 var(--border-radius-medium) 0 10px;
             font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
             display: inline-flex; align-items: center; gap: 4px; z-index: 2;
@@ -1629,7 +1610,6 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Ana sayfa boş durum hızlı butonları
             document.getElementById('btnEmptyScan').addEventListener('click', () => els.btnScan.click());
             document.getElementById('btnEmptyLocation').addEventListener('click', () => openModal(els.locationModal));
 
@@ -2074,10 +2054,10 @@
                 return await postMarketApi('searchByIdentity', base);
             }
 
-            // İsimden temizlenmiş arama sorgusu üret (gramaj/hacim birimlerini çıkar)
+            // Gramaj/birim eklerini temizleyip net ürün adını üret
             function cleanProductQueryForOff(title, brand) {
                 let t = (title || '')
-                    .replace(/\b\d+\s*(x\s*\d+\s*)?(gr?|kg|ml|lt?|l|cl|adet|li|lı|lu|lü)\b/gi, ' ')
+                    .replace(/\b\d+([.,]\d+)?\s*(x\s*\d+\s*)?(gr?|kg|ml|lt?|l|cl|adet|li|lı|lu|lü)\b/gi, ' ')
                     .replace(/[^\wçğıöşüÇĞİÖŞÜ\s]/g, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
@@ -2088,60 +2068,119 @@
                 return t;
             }
 
-            // Open Food Facts'te barkodla bulamazsa ürün adıyla en uygun eşleşmeyi ara
+            function tokenizeStrict(text) {
+                return normalizeTr(text)
+                    .replace(/\b\d+([.,]\d+)?\s*(gr?|kg|ml|lt?|l|cl|adet)\b/g, ' ')
+                    .split(' ')
+                    .filter(w => w.length >= 2);
+            }
+
+            // Çift yönlü F1 kelime benzerliği + zorunlu marka kontrolü (yanlış eşleşmeyi önler)
+            function pickStrictOffMatch(candidates, title, brand) {
+                const cleanedQuery = cleanProductQueryForOff(title, brand);
+                const targetTokens = Array.from(new Set(tokenizeStrict(cleanedQuery)));
+                if (targetTokens.length === 0) return null;
+                const targetAsciiSet = new Set(targetTokens.map(foldTurkishToAscii));
+
+                const primaryBrandNorm = normalizeTr((brand || '').split(',')[0].trim());
+                const primaryBrandAscii = foldTurkishToAscii(primaryBrandNorm);
+                const brandParts = primaryBrandAscii ? primaryBrandAscii.split(' ').filter(w => w.length >= 2) : [];
+
+                let best = null;
+                let bestScore = 0;
+
+                for (const p of candidates) {
+                    const hasData = Boolean(
+                        p.ingredients_text_with_allergens_tr || p.ingredients_text_tr || p.ingredients_text ||
+                        (p.nutriments && Object.keys(p.nutriments).length >= 3) || p.nutriscore_grade
+                    );
+                    if (!hasData) continue;
+
+                    const candName = p.product_name_tr || p.product_name || '';
+                    const candFull = `${p.brands || ''} ${candName}`;
+                    const candTokens = Array.from(new Set(tokenizeStrict(candFull)));
+                    if (candTokens.length === 0) continue;
+                    const candAsciiSet = new Set(candTokens.map(foldTurkishToAscii));
+
+                    // Marka verilmişse aday üründe marka doğrulaması yap
+                    if (brandParts.length > 0) {
+                        const brandMatched = brandParts.every(bp => candAsciiSet.has(bp));
+                        if (!brandMatched) continue;
+                    }
+
+                    // Tam kelime kesişimi (alt-metin hatası olmadan)
+                    let matches = 0;
+                    targetAsciiSet.forEach(t => { if (candAsciiSet.has(t)) matches++; });
+
+                    if (matches < 2 && targetAsciiSet.size >= 2) continue;
+
+                    const targetCov = matches / targetAsciiSet.size;
+                    const candCov = matches / candAsciiSet.size;
+                    const f1 = (targetCov + candCov) > 0 ? (2 * targetCov * candCov) / (targetCov + candCov) : 0;
+
+                    // Sıkı eşik: hem aranan kelimelerin %75'i bulunmalı hem aday alakasız ekstra varyant kelimeleriyle şişmemiş olmalı
+                    if (targetCov < 0.75 || candCov < 0.65 || f1 < 0.70) continue;
+
+                    let score = f1 * 20;
+                    if (p.ingredients_text_with_allergens_tr || p.ingredients_text_tr || p.ingredients_text) score += 5;
+                    if (p.nutriments && Object.keys(p.nutriments).length >= 4) score += 2;
+                    if (Array.isArray(p.countries_tags) && p.countries_tags.includes('en:turkey')) score += 3;
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = p;
+                    }
+                }
+                return best;
+            }
+
             async function fetchOpenFoodFactsByName(title, brand) {
                 const cleanedQuery = cleanProductQueryForOff(title, brand);
                 if (!cleanedQuery || cleanedQuery.length < 3) return null;
 
-                const targetTokens = normalizeTr(cleanedQuery).split(' ').filter(w => w.length >= 2);
-                if (targetTokens.length === 0) return null;
+                const urls = [
+                    `https://world.openfoodfacts.org/api/v2/search?search_terms=${encodeURIComponent(cleanedQuery)}&countries_tags_en=turkey&page_size=10&fields=${encodeURIComponent(OFF_FIELDS)}`,
+                    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanedQuery)}&search_simple=1&action=process&json=1&page_size=10&fields=${encodeURIComponent(OFF_FIELDS)}`
+                ];
 
-                try {
-                    const ctrl = new AbortController();
-                    const timer = setTimeout(() => ctrl.abort(), 5500);
-                    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanedQuery)}&search_simple=1&action=process&json=1&page_size=8&fields=${encodeURIComponent(OFF_FIELDS)}`;
-                    const res = await fetch(url, { signal: ctrl.signal });
-                    clearTimeout(timer);
-                    if (!res.ok) return null;
-                    const data = await res.json();
-                    const candidates = data?.products || [];
-                    if (candidates.length === 0) return null;
-
-                    let best = null;
-                    let bestScore = 0;
-
-                    for (const p of candidates) {
-                        const pText = normalizeTr(`${p.brands || ''} ${p.product_name_tr || p.product_name || ''}`);
-                        if (!pText) continue;
-                        const pTokens = new Set(pText.split(' ').filter(w => w.length >= 2));
-
-                        let matchCount = 0;
-                        targetTokens.forEach(tok => {
-                            if (pTokens.has(tok) || pText.includes(tok)) matchCount++;
-                        });
-
-                        const ratio = matchCount / targetTokens.length;
-                        if (matchCount < 2 && ratio < 0.6) continue;
-
-                        let score = ratio * 10 + matchCount * 2;
-                        if (p.ingredients_text_with_allergens_tr || p.ingredients_text_tr || p.ingredients_text) score += 4;
-                        if (p.nutriments && Object.keys(p.nutriments).length > 0) score += 2;
-                        if (p.nutriscore_grade) score += 1;
-                        if (Array.isArray(p.countries_tags) && p.countries_tags.includes('en:turkey')) score += 3;
-
-                        if (score > bestScore) {
-                            bestScore = score;
-                            best = p;
-                        }
-                    }
-                    return best;
-                } catch {
-                    return null;
+                for (const url of urls) {
+                    try {
+                        const ctrl = new AbortController();
+                        const timer = setTimeout(() => ctrl.abort(), 5000);
+                        const res = await fetch(url, { signal: ctrl.signal });
+                        clearTimeout(timer);
+                        if (!res.ok) continue;
+                        const data = await res.json();
+                        const match = pickStrictOffMatch(data?.products || [], title, brand);
+                        if (match) return match;
+                    } catch {}
                 }
+                return null;
+            }
+
+            function mergeOffData(base, extra) {
+                if (!base) return extra;
+                if (!extra) return base;
+                const merged = { ...base };
+                if (!merged.ingredients_text_with_allergens_tr && extra.ingredients_text_with_allergens_tr) merged.ingredients_text_with_allergens_tr = extra.ingredients_text_with_allergens_tr;
+                if (!merged.ingredients_text_tr && extra.ingredients_text_tr) merged.ingredients_text_tr = extra.ingredients_text_tr;
+                if (!merged.ingredients_text && extra.ingredients_text) merged.ingredients_text = extra.ingredients_text;
+                if ((!merged.allergens_hierarchy || merged.allergens_hierarchy.length === 0) && extra.allergens_hierarchy?.length) merged.allergens_hierarchy = extra.allergens_hierarchy;
+                if ((!merged.traces_hierarchy || merged.traces_hierarchy.length === 0) && extra.traces_hierarchy?.length) merged.traces_hierarchy = extra.traces_hierarchy;
+                if ((!merged.additives_tags || merged.additives_tags.length === 0) && extra.additives_tags?.length) merged.additives_tags = extra.additives_tags;
+                if ((!merged.ingredients_analysis_tags || merged.ingredients_analysis_tags.length === 0) && extra.ingredients_analysis_tags?.length) merged.ingredients_analysis_tags = extra.ingredients_analysis_tags;
+                if ((!merged.labels_tags || merged.labels_tags.length === 0) && extra.labels_tags?.length) merged.labels_tags = extra.labels_tags;
+                if (!merged.nutriscore_grade && extra.nutriscore_grade) merged.nutriscore_grade = extra.nutriscore_grade;
+                if (!merged.ecoscore_grade && extra.ecoscore_grade) merged.ecoscore_grade = extra.ecoscore_grade;
+                if (!merged.nova_group && extra.nova_group) merged.nova_group = extra.nova_group;
+                if ((!merged.nutriments || Object.keys(merged.nutriments).length < 3) && extra.nutriments) merged.nutriments = extra.nutriments;
+                if ((!merged.nutrient_levels || Object.keys(merged.nutrient_levels).length === 0) && extra.nutrient_levels) merged.nutrient_levels = extra.nutrient_levels;
+                if (!merged.serving_size && extra.serving_size) merged.serving_size = extra.serving_size;
+                return merged;
             }
 
             async function fetchOpenFoodFacts(barcode, fallbackTitle = '', fallbackBrand = '') {
-                let offData = null, offUserPriceData = null, matchedByName = false;
+                let offData = null, offUserPriceData = null, matchedByName = false, matchedNameTitle = '';
 
                 if (barcode) {
                     try {
@@ -2151,13 +2190,16 @@
                     } catch {}
                 }
 
-                // Barkodda bulunamadıysa veya içindekiler/besin bilgisi yoksa isimle Open Food Facts'te ara
-                const hasUsefulOffInfo = offData && (offData.ingredients_text_with_allergens_tr || offData.ingredients_text_tr || offData.ingredients_text || offData.nutriscore_grade || (offData.nutriments && Object.keys(offData.nutriments).length > 2));
-                if (!hasUsefulOffInfo && fallbackTitle) {
+                // İçindekiler veya besin değerleri eksikse isimle Open Food Facts'te ara ve eksikleri tamamla
+                const hasIngredients = Boolean(offData && (offData.ingredients_text_with_allergens_tr || offData.ingredients_text_tr || offData.ingredients_text));
+                const hasNutriments = Boolean(offData && offData.nutriments && Object.keys(offData.nutriments).length >= 3);
+
+                if ((!offData || !hasIngredients || !hasNutriments) && fallbackTitle) {
                     const nameMatch = await fetchOpenFoodFactsByName(fallbackTitle, fallbackBrand);
                     if (nameMatch) {
-                        offData = nameMatch;
+                        offData = mergeOffData(offData, nameMatch);
                         matchedByName = true;
+                        matchedNameTitle = nameMatch.product_name_tr || nameMatch.product_name || '';
                     }
                 }
 
@@ -2171,7 +2213,7 @@
                         }
                     } catch {}
                 }
-                return { offData, offUserPriceData, matchedByName };
+                return { offData, offUserPriceData, matchedByName, matchedNameTitle };
             }
 
             async function startSearch(query) {
@@ -2205,7 +2247,7 @@
                     if (json.content && json.content.length > 0) marketData = json.content[0];
                 } catch {}
 
-                const { offData, offUserPriceData, matchedByName } = await fetchOpenFoodFacts(
+                const { offData, offUserPriceData, matchedByName, matchedNameTitle } = await fetchOpenFoodFacts(
                     barcode,
                     marketData?.title || '',
                     marketData?.brand || ''
@@ -2220,7 +2262,7 @@
 
                 els.btnBackToResults.classList.remove('visible');
                 showAllFarDepots = false;
-                await renderProduct(marketData, offData, offUserPriceData, barcode, matchedByName);
+                await renderProduct(marketData, offData, offUserPriceData, barcode, matchedByName, matchedNameTitle);
             }
 
             async function performKeywordSearch(keywords) {
@@ -2238,14 +2280,6 @@
                 } catch {}
 
                 if (!json || !json.content || json.content.length === 0) {
-                    // Market Fiyatı'nda bulunamazsa yine de Open Food Facts'te isimle ara
-                    const offMatch = await fetchOpenFoodFactsByName(keywords, '');
-                    if (offMatch) {
-                        els.btnBackToResults.classList.remove('visible');
-                        showAllFarDepots = false;
-                        await renderProduct(null, offMatch, null, offMatch.code || null, true);
-                        return;
-                    }
                     showSnackbar('Aramanızla eşleşen ürün bulunamadı.', 'error');
                     speak('Ürün bulunamadı');
                     setUiState('none');
@@ -2406,19 +2440,19 @@
                 }
 
                 const barcode = fullMarketData.barcode || item.barcode || null;
-                const { offData, offUserPriceData, matchedByName } = await fetchOpenFoodFacts(
+                const { offData, offUserPriceData, matchedByName, matchedNameTitle } = await fetchOpenFoodFacts(
                     barcode,
                     fullMarketData.title || item.title || '',
                     fullMarketData.brand || item.brand || ''
                 );
 
                 els.btnBackToResults.classList.toggle('visible', fromResultsList && currentSearchResults.length > 1);
-                await renderProduct(fullMarketData, offData, offUserPriceData, barcode, matchedByName);
+                await renderProduct(fullMarketData, offData, offUserPriceData, barcode, matchedByName, matchedNameTitle);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             // --- ÜRÜN DETAY RENDER ---
-            async function renderProduct(m, o, offPrice, explicitBarcode, matchedByName = false) {
+            async function renderProduct(m, o, offPrice, explicitBarcode, matchedByName = false, matchedNameTitle = '') {
                 const name = m?.title || o?.product_name_tr || o?.product_name || 'Bilinmeyen Ürün';
                 const brand = o?.brands || m?.brand || '';
                 const quantity = o?.quantity || m?.refinedVolumeOrWeight || '';
@@ -2432,8 +2466,8 @@
 
                 const offMatchNote = document.getElementById('offMatchNote');
                 if (matchedByName && o) {
-                    const matchedTitle = o.product_name_tr || o.product_name || name;
-                    document.getElementById('offMatchNoteText').textContent = `İçindekiler ve besin değerleri Open Food Facts üzerinden "${matchedTitle}" ürünüyle eşleştirildi.`;
+                    const mTitle = matchedNameTitle || o.product_name_tr || o.product_name || name;
+                    document.getElementById('offMatchNoteText').textContent = `Eksik içerik/besin verileri Open Food Facts'teki "${mTitle}" kaydından tamamlandı.`;
                     offMatchNote.classList.add('visible');
                 } else {
                     offMatchNote.classList.remove('visible');
