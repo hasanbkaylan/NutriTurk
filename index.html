@@ -23,7 +23,7 @@
     <meta name="msapplication-TileImage" content="./icons/ms-icon-144x144.png">
     <meta name="theme-color" content="#006C51">
 
-    <title>NutriTürk Pro - Akıllı Gıda & Fiyat Tarayıcı</title>
+    <title>NutriTürk - Gıda & Fiyat Tarayıcı</title>
     
     <!-- Google Fonts: Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,13 +37,11 @@
             const DB_NAME = "NutriTurkFontDB";
             const STORE_NAME = "fonts";
             const CACHE_KEY = "md3_symbols_v1";
-            const CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 14 gün
+            const CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
             function markReady() {
                 document.documentElement.classList.add('icons-ready');
             }
-
-            // Güvenlik zaman aşımı (ikonların asla gizli kalmaması için)
             setTimeout(markReady, 1500);
 
             function injectFallbackLink() {
@@ -82,8 +80,7 @@
                 const db = await openFontDB();
                 return new Promise((resolve, reject) => {
                     const tx = db.transaction(STORE_NAME, 'readonly');
-                    const store = tx.objectStore(STORE_NAME);
-                    const req = store.get(CACHE_KEY);
+                    const req = tx.objectStore(STORE_NAME).get(CACHE_KEY);
                     req.onsuccess = () => resolve(req.result);
                     req.onerror = () => reject(req.error);
                 });
@@ -93,8 +90,7 @@
                 const db = await openFontDB();
                 return new Promise((resolve, reject) => {
                     const tx = db.transaction(STORE_NAME, 'readwrite');
-                    const store = tx.objectStore(STORE_NAME);
-                    const req = store.put(record, CACHE_KEY);
+                    const req = tx.objectStore(STORE_NAME).put(record, CACHE_KEY);
                     req.onsuccess = () => resolve();
                     req.onerror = () => reject(req.error);
                 });
@@ -119,11 +115,7 @@
                         }
                     }));
 
-                    const record = {
-                        cssText,
-                        blobs,
-                        savedAt: Date.now()
-                    };
+                    const record = { cssText, blobs, savedAt: Date.now() };
                     await saveCachedFont(record);
                     localStorage.setItem('nutriturk_md3_cached', '1');
                     return record;
@@ -157,10 +149,7 @@
             window.NutriIconCache = {
                 refresh: async function() {
                     const rec = await fetchAndCacheMD3();
-                    if (rec) {
-                        applyCachedRecord(rec);
-                        return true;
-                    }
+                    if (rec) { applyCachedRecord(rec); return true; }
                     return false;
                 },
                 status: async function() {
@@ -186,16 +175,13 @@
                     const rec = await getCachedFont();
                     if (rec && rec.cssText && rec.blobs) {
                         applyCachedRecord(rec);
-                        // Arka planda süresi dolduysa sessizce yenile
-                        if (Date.now() - (rec.savedAt || 0) > CACHE_TTL_MS) {
-                            fetchAndCacheMD3();
-                        }
+                        if (Date.now() - (rec.savedAt || 0) > CACHE_TTL_MS) fetchAndCacheMD3();
                     } else {
                         localStorage.removeItem('nutriturk_md3_cached');
                         injectFallbackLink();
                         await fetchAndCacheMD3();
                     }
-                } catch (e) {
+                } catch {
                     injectFallbackLink();
                 }
             })();
@@ -233,9 +219,9 @@
             --md-sys-color-surface-container-high: #E5EAE7;
             --md-sys-color-surface-container-highest: #DFE4E1;
             
-            --border-radius-large: 24px;
-            --border-radius-medium: 16px;
-            --transition-standard: all 0.28s cubic-bezier(0.2, 0, 0, 1);
+            --border-radius-large: 20px;
+            --border-radius-medium: 14px;
+            --transition-standard: all 0.25s cubic-bezier(0.2, 0, 0, 1);
         }
 
         [data-theme="dark"] {
@@ -269,6 +255,12 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
         
         body {
             font-family: 'Roboto', sans-serif;
@@ -285,7 +277,6 @@
         img { -webkit-user-drag: none; }
         body.no-scroll { overflow: hidden; }
 
-        /* MD3 İkon Stili ve FOIT Koruması */
         .material-symbols-rounded {
             font-family: 'Material Symbols Rounded';
             font-weight: normal;
@@ -307,9 +298,9 @@
 
         /* --- TOP APP BAR --- */
         .top-app-bar {
-            background-color: var(--md-sys-color-surface); height: 64px;
+            background-color: var(--md-sys-color-surface); height: 58px; width: 100%;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px 0 16px; position: sticky; top: 0; z-index: 1000;
+            padding: 0 6px 0 10px; position: sticky; top: 0; z-index: 1000;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
         .top-app-bar.scrolled {
@@ -317,96 +308,103 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .brand-logo { height: 32px; width: 32px; object-fit: contain; }
-        .brand h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.2px; }
-        .brand-tag {
-            font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px;
-            background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-        }
+        .brand { display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 0; }
+        .brand-logo { height: 28px; width: 28px; object-fit: contain; flex-shrink: 0; }
+        .brand h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.2px; white-space: nowrap; }
 
-        .app-actions { display: flex; gap: 2px; }
+        .app-actions { display: flex; gap: 0; flex-shrink: 0; }
         .icon-btn {
-            background: none; border: none; width: 44px; height: 44px; position: relative;
+            background: none; border: none; width: 40px; height: 40px; position: relative;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             color: var(--md-sys-color-on-surface-variant); cursor: pointer; transition: var(--transition-standard);
         }
         .icon-btn:hover { background-color: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); }
         
         .nav-badge {
-            position: absolute; top: 4px; right: 4px; 
+            position: absolute; top: 3px; right: 3px; 
             background-color: var(--md-sys-color-error); color: #fff;
-            font-size: 10px; font-weight: 700; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px;
+            font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px;
             display: flex; align-items: center; justify-content: center;
         }
         .nav-badge.fav { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
 
-        /* --- MAIN LAYOUT --- */
-        .main-container { max-width: 840px; margin: 0 auto; padding: 16px 16px 32px; min-height: calc(100vh - 150px); }
+        /* --- MAIN LAYOUT (Daha Az Kenar Boşluğu, Geniş Alan) --- */
+        .main-container {
+            width: 100%; max-width: 880px; margin: 0 auto;
+            padding: 8px 8px 28px;
+            min-height: calc(100vh - 140px);
+        }
+        @media (min-width: 640px) {
+            .top-app-bar { padding: 0 14px 0 18px; height: 62px; }
+            .icon-btn { width: 44px; height: 44px; }
+            .main-container { padding: 14px 16px 32px; }
+        }
 
         /* --- SEARCH SECTION --- */
         .search-card {
             background-color: var(--md-sys-color-surface-container-low);
-            border-radius: var(--border-radius-large); padding: 20px;
-            margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;
+            border-radius: var(--border-radius-large); padding: 12px;
+            margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;
             border: 1px solid var(--md-sys-color-outline-variant);
+            width: 100%; min-width: 0;
+        }
+        @media (min-width: 640px) {
+            .search-card { padding: 18px; gap: 12px; }
         }
 
-        .location-bar {
-            display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
-        }
+        .location-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; min-width: 0; }
         .location-pill {
-            display: inline-flex; align-items: center; gap: 6px;
+            display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
             background-color: var(--md-sys-color-surface-container-high);
             color: var(--md-sys-color-on-surface); border: none; border-radius: 99px;
-            padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+            padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer;
             transition: var(--transition-standard);
         }
+        .location-pill span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .location-pill.active {
             background-color: var(--md-sys-color-primary-container);
             color: var(--md-sys-color-on-primary-container);
         }
-        .location-pill .material-symbols-rounded { font-size: 18px; }
+        .location-pill .material-symbols-rounded { font-size: 17px; flex-shrink: 0; }
 
-        .search-bar-wrapper { display: flex; gap: 10px; align-items: center; }
+        .search-bar-wrapper { display: flex; gap: 8px; align-items: center; width: 100%; min-width: 0; }
         .search-input-container {
-            flex: 1; position: relative; display: flex; align-items: center;
+            flex: 1; min-width: 0; position: relative; display: flex; align-items: center;
             background-color: var(--md-sys-color-surface-container-highest);
-            border-radius: 28px; height: 54px; padding: 0 12px 0 16px; transition: var(--transition-standard);
+            border-radius: 26px; height: 50px; padding: 0 10px 0 14px; transition: var(--transition-standard);
         }
         .search-input-container:focus-within {
             background-color: var(--md-sys-color-surface);
             box-shadow: inset 0 0 0 2px var(--md-sys-color-primary);
         }
-        .search-input-container .material-symbols-rounded { color: var(--md-sys-color-on-surface-variant); margin-right: 10px; }
+        .search-input-container .material-symbols-rounded { color: var(--md-sys-color-on-surface-variant); margin-right: 8px; flex-shrink: 0; }
         .search-input-container input {
-            border: none; background: transparent; flex: 1; height: 100%; min-width: 0;
+            border: none; background: transparent; flex: 1; height: 100%; min-width: 0; width: 100%;
             font-size: 15px; color: var(--md-sys-color-on-surface); outline: none; font-family: inherit;
         }
         .clear-input-btn {
             background: none; border: none; color: var(--md-sys-color-on-surface-variant);
-            cursor: pointer; display: none; padding: 4px; border-radius: 50%;
+            cursor: pointer; display: none; padding: 4px; border-radius: 50%; flex-shrink: 0;
         }
         .clear-input-btn.visible { display: flex; }
 
         .fab-scan {
-            width: 54px; height: 54px; border-radius: 16px; flex-shrink: 0;
+            width: 50px; height: 50px; border-radius: 15px; flex-shrink: 0;
             background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
             display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.12); transition: var(--transition-standard);
+            border: none; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.12); transition: var(--transition-standard);
         }
-        .fab-scan:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.18); }
+        .fab-scan:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.16); }
 
-        /* Chips Rows */
-        .chips-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+        .chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; width: 100%; min-width: 0; }
         .chips-row::-webkit-scrollbar { display: none; }
         .chip {
             background-color: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant);
-            border: 1px solid var(--md-sys-color-outline-variant); padding: 6px 12px; border-radius: 10px; font-size: 13px;
-            white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-            transition: var(--transition-standard); font-weight: 500;
+            border: 1px solid var(--md-sys-color-outline-variant); padding: 6px 11px; border-radius: 10px; font-size: 12px;
+            white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+            transition: var(--transition-standard); font-weight: 500; flex-shrink: 0;
         }
-        .chip .material-symbols-rounded { font-size: 16px; }
+        .chip .material-symbols-rounded { font-size: 15px; }
         .chip:hover, .chip.active {
             background-color: var(--md-sys-color-secondary-container);
             color: var(--md-sys-color-on-secondary-container);
@@ -415,49 +413,77 @@
         .chip.cat-chip { background-color: var(--md-sys-color-surface); }
 
         /* --- SKELETON LOADER --- */
-        .skeleton-wrapper { display: none; flex-direction: column; gap: 16px; animation: pulse 1.5s infinite ease-in-out; }
+        .skeleton-wrapper { display: none; flex-direction: column; gap: 14px; animation: pulse 1.5s infinite ease-in-out; width: 100%; }
         @keyframes pulse { 0% { opacity: 0.65; } 50% { opacity: 0.35; } 100% { opacity: 0.65; } }
         .skeleton-box { background-color: var(--md-sys-color-surface-container-high); border-radius: var(--border-radius-medium); }
-        .sk-header { height: 120px; display: flex; gap: 16px; padding: 16px; }
-        .sk-img { width: 88px; height: 88px; border-radius: 12px; background: var(--md-sys-color-surface-container-highest); }
-        .sk-text { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-        .sk-line { height: 18px; border-radius: 6px; background-color: var(--md-sys-color-surface-container-highest); }
+        .sk-header { height: 112px; display: flex; gap: 14px; padding: 14px; }
+        .sk-img { width: 84px; height: 84px; border-radius: 12px; background: var(--md-sys-color-surface-container-highest); flex-shrink: 0; }
+        .sk-text { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0; }
+        .sk-line { height: 16px; border-radius: 6px; background-color: var(--md-sys-color-surface-container-highest); }
         .sk-line.short { width: 45%; }
-        .sk-card { height: 72px; }
+        .sk-card { height: 68px; }
 
         /* --- MULTI-PRODUCT SEARCH RESULTS --- */
-        .search-results-section { display: none; flex-direction: column; gap: 14px; animation: fadeInUp 0.3s ease; }
+        .search-results-section { display: none; flex-direction: column; gap: 12px; animation: fadeInUp 0.25s ease; width: 100%; min-width: 0; }
         .search-results-section.show { display: flex; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .results-toolbar {
-            display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
-        }
-        .results-count { font-size: 14px; color: var(--md-sys-color-on-surface-variant); font-weight: 500; }
+        .results-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .results-count { font-size: 13px; color: var(--md-sys-color-on-surface-variant); font-weight: 500; }
         .m3-select {
             background-color: var(--md-sys-color-surface-container-high);
             color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: 10px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
+            border-radius: 10px; padding: 7px 10px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
+            max-width: 100%;
         }
 
         .results-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px;
+            width: 100%; min-width: 0;
         }
         .product-grid-card {
             background-color: var(--md-sys-color-surface-container);
             border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: var(--border-radius-medium); padding: 14px;
+            border-radius: var(--border-radius-medium); padding: 12px;
             display: flex; flex-direction: column; gap: 10px; cursor: pointer;
-            transition: var(--transition-standard); position: relative;
+            transition: var(--transition-standard); position: relative; overflow: hidden;
+            min-width: 0; width: 100%;
         }
         .product-grid-card:hover {
             transform: translateY(-2px);
             background-color: var(--md-sys-color-surface-container-high);
             border-color: var(--md-sys-color-primary);
         }
-        .pg-top { display: flex; gap: 12px; align-items: center; }
+        .product-grid-card.pg-boycott {
+            background-color: #FFF0EE; border-color: rgba(186, 26, 26, 0.35);
+        }
+        [data-theme="dark"] .product-grid-card.pg-boycott {
+            background-color: #381414; border-color: rgba(255, 180, 171, 0.3);
+        }
+        .product-grid-card.pg-safe {
+            background-color: #EFFBF4; border-color: rgba(0, 108, 81, 0.3);
+        }
+        [data-theme="dark"] .product-grid-card.pg-safe {
+            background-color: #0E2B1E; border-color: rgba(95, 219, 180, 0.25);
+        }
+
+        /* Kart Sağ Üst Boykot Köşe Rozeti */
+        .pg-corner-badge {
+            position: absolute; top: 0; right: 0;
+            padding: 3px 9px 4px 10px;
+            border-radius: 0 var(--border-radius-medium) 0 10px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+            display: inline-flex; align-items: center; gap: 4px;
+            z-index: 2;
+        }
+        .pg-corner-badge .material-symbols-rounded { font-size: 13px; }
+        .pg-corner-badge.boycott { background-color: #BA1A1A; color: #FFFFFF; }
+        .pg-corner-badge.safe { background-color: #006C51; color: #FFFFFF; }
+
+        .pg-top { display: flex; gap: 10px; align-items: center; min-width: 0; }
+        .product-grid-card.has-badge .pg-top { margin-top: 14px; }
         .pg-img {
-            width: 68px; height: 68px; object-fit: contain; border-radius: 12px;
+            width: 64px; height: 64px; object-fit: contain; border-radius: 10px;
             background: #fff; padding: 4px; flex-shrink: 0;
         }
         .pg-meta { flex: 1; min-width: 0; }
@@ -468,34 +494,42 @@
         }
         .pg-weight { font-size: 11px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
         .pg-bottom {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 10px; margin-top: auto;
+            display: flex; justify-content: space-between; align-items: flex-end; gap: 8px;
+            border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 8px; margin-top: auto;
         }
-        .pg-price-col { display: flex; flex-direction: column; }
+        .pg-price-col { display: flex; flex-direction: column; flex-shrink: 0; }
         .pg-min-label { font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
-        .pg-price { font-size: 18px; font-weight: 700; color: var(--md-sys-color-primary); }
-        .pg-unit { font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
-        .pg-market-count {
-            font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 8px;
-            background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container);
+        .pg-price { font-size: 17px; font-weight: 700; color: var(--md-sys-color-primary); }
+        .pg-unit { font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
+
+        /* Kart İçi Küçük Market Logoları */
+        .pg-market-logos {
+            display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 5px; min-width: 0;
         }
+        .pg-mk-pill {
+            background: #fff; border-radius: 6px; padding: 2px 5px;
+            display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+        .pg-mk-logo { height: 13px; max-width: 44px; object-fit: contain; display: block; }
+        .pg-mk-txt { font-size: 10px; font-weight: 700; color: #222; }
 
         /* --- PRODUCT RESULT CARD --- */
-        .result-card { display: none; opacity: 0; transform: translateY(16px); transition: var(--transition-standard); }
+        .result-card { display: none; opacity: 0; transform: translateY(14px); transition: var(--transition-standard); width: 100%; min-width: 0; }
         .result-card.show { opacity: 1; transform: translateY(0); display: block; }
 
         .back-to-results-btn {
-            display: none; align-items: center; gap: 6px; margin-bottom: 12px;
+            display: none; align-items: center; gap: 6px; margin-bottom: 10px;
             background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface);
-            border: none; padding: 8px 14px; border-radius: 99px; font-size: 13px; font-weight: 500; cursor: pointer;
+            border: none; padding: 7px 12px; border-radius: 99px; font-size: 13px; font-weight: 500; cursor: pointer;
         }
         .back-to-results-btn.visible { display: inline-flex; }
         .back-to-results-btn .material-symbols-rounded { font-size: 18px; }
 
         .product-header {
             background-color: var(--md-sys-color-surface-container); border-radius: var(--border-radius-large);
-            padding: 24px 20px 20px; display: flex; gap: 20px; margin-bottom: 16px; align-items: center;
-            position: relative; overflow: hidden; transition: background-color 0.4s ease;
+            padding: 20px 14px 16px; display: flex; gap: 16px; margin-bottom: 14px; align-items: center;
+            position: relative; overflow: hidden; transition: background-color 0.4s ease; width: 100%; min-width: 0;
         }
         .product-header.boycott-active { background-color: #FFDAD6; }
         [data-theme="dark"] .product-header.boycott-active { background-color: #5C1A1A; }
@@ -503,7 +537,7 @@
         [data-theme="dark"] .product-header.boycott-safe { background-color: #0A3320; }
 
         .boycott-badge {
-            position: absolute; top: 0; right: 0; padding: 6px 14px 6px 16px;
+            position: absolute; top: 0; right: 0; padding: 5px 12px 5px 14px;
             border-radius: 0 var(--border-radius-large) 0 var(--border-radius-medium);
             font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
             display: flex; align-items: center; gap: 5px;
@@ -514,7 +548,7 @@
         .boycott-badge.safe { background-color: #006C51; color: #FFFFFF; }
         .boycott-badge .material-symbols-rounded { font-size: 16px; }
         
-        .product-img-box { position: relative; width: 112px; height: 112px; flex-shrink: 0; }
+        .product-img-box { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
         .product-img-box img {
             width: 100%; height: 100%; object-fit: contain; border-radius: var(--border-radius-medium);
             background-color: #fff; padding: 6px; cursor: zoom-in;
@@ -522,23 +556,23 @@
         }
         .product-img-box img:hover { transform: scale(1.04); }
         .product-info { flex: 1; min-width: 0; }
-        .product-brand { font-size: 13px; font-weight: 700; color: var(--md-sys-color-primary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-        .product-title { font-size: 21px; font-weight: 500; color: var(--md-sys-color-on-surface); line-height: 1.25; margin-bottom: 10px; }
-        .product-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-        .product-quantity { font-size: 12px; font-weight: 500; color: var(--md-sys-color-on-surface-variant); background: var(--md-sys-color-surface-variant); padding: 4px 10px; border-radius: 8px; }
+        .product-brand { font-size: 12px; font-weight: 700; color: var(--md-sys-color-primary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+        .product-title { font-size: 20px; font-weight: 500; color: var(--md-sys-color-on-surface); line-height: 1.25; margin-bottom: 10px; word-break: break-word; }
+        .product-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .product-quantity { font-size: 12px; font-weight: 500; color: var(--md-sys-color-on-surface-variant); background: var(--md-sys-color-surface-variant); padding: 4px 9px; border-radius: 8px; }
         .product-action-pill {
             display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500;
             background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface);
-            border: 1px solid var(--md-sys-color-outline-variant); padding: 4px 10px; border-radius: 8px; cursor: pointer;
+            border: 1px solid var(--md-sys-color-outline-variant); padding: 4px 9px; border-radius: 8px; cursor: pointer;
             transition: var(--transition-standard);
         }
-        .product-action-pill .material-symbols-rounded { font-size: 16px; }
+        .product-action-pill .material-symbols-rounded { font-size: 15px; }
         .product-action-pill.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: transparent; }
 
         /* --- PERSONAL DIET ALERT BANNER --- */
         .diet-alert-banner {
-            display: none; align-items: flex-start; gap: 12px; padding: 14px 16px;
-            border-radius: var(--border-radius-medium); margin-bottom: 16px;
+            display: none; align-items: flex-start; gap: 10px; padding: 12px 14px;
+            border-radius: var(--border-radius-medium); margin-bottom: 14px;
             background-color: var(--md-sys-color-warning-container); color: var(--md-sys-color-on-warning-container);
             border: 1px solid var(--md-sys-color-warning);
         }
@@ -547,22 +581,22 @@
         .diet-alert-text { font-size: 13px; line-height: 1.45; }
 
         /* --- SCORES & TAGS --- */
-        .scores-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .scores-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; margin-bottom: 12px; }
         .score-item {
             background-color: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: var(--border-radius-medium); padding: 12px 8px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+            border-radius: var(--border-radius-medium); padding: 10px 6px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
         }
         .score-item span { font-size: 11px; font-weight: 600; color: var(--md-sys-color-on-surface-variant); text-align: center; }
-        .score-item img { height: 36px; width: auto; }
+        .score-item img { height: 34px; width: auto; }
 
-        .analysis-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .analysis-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
         .a-badge {
-            display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500;
-            padding: 5px 11px; border-radius: 99px;
+            display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500;
+            padding: 4px 10px; border-radius: 99px;
             background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface);
         }
-        .a-badge .material-symbols-rounded { font-size: 16px; }
+        .a-badge .material-symbols-rounded { font-size: 15px; }
         .a-badge.good { background: #D6F5E3; color: #004E36; }
         .a-badge.bad { background: #FFDAD6; color: #7C0006; }
         .a-badge.warn { background: #FFDCBC; color: #5E3400; }
@@ -573,54 +607,65 @@
         /* --- PRICE ANALYTICS CARD --- */
         .price-analytics-card {
             background: var(--md-sys-color-surface-container-low); border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: var(--border-radius-medium); padding: 16px; margin-bottom: 16px;
-            display: none; flex-direction: column; gap: 12px;
+            border-radius: var(--border-radius-medium); padding: 12px; margin-bottom: 14px;
+            display: none; flex-direction: column; gap: 10px;
         }
         .price-analytics-card.visible { display: flex; }
-        .pa-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-        .pa-stat-box { background: var(--md-sys-color-surface); padding: 10px 6px; border-radius: 12px; }
+        .pa-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
+        .pa-stat-box { background: var(--md-sys-color-surface); padding: 8px 4px; border-radius: 10px; min-width: 0; }
         .pa-stat-label { font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
-        .pa-stat-val { font-size: 16px; font-weight: 700; color: var(--md-sys-color-on-surface); }
+        .pa-stat-val { font-size: 15px; font-weight: 700; color: var(--md-sys-color-on-surface); }
         .pa-stat-box.min .pa-stat-val { color: var(--md-sys-color-primary); }
         .pa-stat-box.max .pa-stat-val { color: var(--md-sys-color-error); }
         .pa-savings-banner {
             display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;
             background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-            padding: 10px 14px; border-radius: 12px;
+            padding: 9px 12px; border-radius: 10px;
         }
-        .pa-savings-banner .material-symbols-rounded { font-size: 20px; }
+        .pa-savings-banner .material-symbols-rounded { font-size: 19px; flex-shrink: 0; }
+
+        .location-note-banner {
+            display: none; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+            background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container);
+            padding: 9px 12px; border-radius: 10px; font-size: 12px; margin-bottom: 10px;
+        }
+        .location-note-banner.visible { display: flex; }
+        .location-note-btn {
+            background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface);
+            border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
+        }
 
         /* --- PRICE LIST & BRANCH DETAILS --- */
         .section-header-row {
-            display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px 0; flex-wrap: wrap; gap: 8px;
+            display: flex; justify-content: space-between; align-items: center; margin: 18px 0 10px 0; flex-wrap: wrap; gap: 8px;
         }
-        .section-title { font-size: 17px; font-weight: 600; color: var(--md-sys-color-on-surface); display: flex; align-items: center; gap: 8px; margin: 0; }
+        .section-title { font-size: 16px; font-weight: 600; color: var(--md-sys-color-on-surface); display: flex; align-items: center; gap: 7px; margin: 0; }
         
         .user-price-card {
             background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container);
-            border-radius: var(--border-radius-medium); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
+            border-radius: var(--border-radius-medium); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
         }
         .up-left { display: flex; flex-direction: column; gap: 2px; }
         .up-date { font-size: 12px; opacity: 0.85; }
-        .up-val { font-size: 20px; font-weight: 700; }
+        .up-val { font-size: 19px; font-weight: 700; }
 
-        .price-list { display: flex; flex-direction: column; gap: 10px; }
+        .price-list { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 0; }
         .price-item {
             background-color: var(--md-sys-color-surface-container); border-radius: var(--border-radius-medium);
-            padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            transition: var(--transition-standard); border: 1px solid transparent;
+            padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            transition: var(--transition-standard); border: 1px solid transparent; width: 100%; min-width: 0;
         }
         .price-item:hover { background-color: var(--md-sys-color-surface-container-high); }
         .price-item.cheapest { background-color: var(--md-sys-color-primary-container); border-color: var(--md-sys-color-primary); }
         
         .market-info-col { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
-        .market-top-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .market-logo { height: 24px; max-width: 90px; object-fit: contain; }
-        .branch-name { font-size: 12px; color: var(--md-sys-color-on-surface-variant); font-weight: 500; }
+        .market-top-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-width: 0; }
+        .market-logo { height: 22px; max-width: 85px; object-fit: contain; flex-shrink: 0; }
+        .branch-name { font-size: 12px; color: var(--md-sys-color-on-surface-variant); font-weight: 500; word-break: break-word; }
         .price-item.cheapest .branch-name { color: var(--md-sys-color-on-primary-container); opacity: 0.9; }
         
         .market-sub-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
-        .price-item.cheapest .market-sub-row { color: var(--md-sys-color-on-primary-container); opacity: 0.85; }
+        .price-item.cheapest .market-sub-row { color: var(--md-sys-color-on-primary-container); opacity: 0.88; }
         .map-link-btn {
             display: inline-flex; align-items: center; gap: 3px; color: var(--md-sys-color-primary);
             text-decoration: none; font-weight: 600; background: var(--md-sys-color-surface);
@@ -630,7 +675,7 @@
 
         .price-value-box { display: flex; flex-direction: row; align-items: center; gap: 10px; flex-shrink: 0; }
         .price-info-inner { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .price-val { font-size: 19px; font-weight: 700; color: var(--md-sys-color-on-surface); }
+        .price-val { font-size: 18px; font-weight: 700; color: var(--md-sys-color-on-surface); }
         .price-item.cheapest .price-val { color: var(--md-sys-color-on-primary-container); }
         .unit-price-txt { font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
         .price-item.cheapest .unit-price-txt { color: var(--md-sys-color-on-primary-container); opacity: 0.9; }
@@ -639,7 +684,7 @@
 
         .add-to-cart-btn {
             background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
-            border: none; border-radius: 10px; width: 38px; height: 38px;
+            border: none; border-radius: 10px; width: 38px; height: 38px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
         }
         .add-to-cart-btn:hover { opacity: 0.9; transform: scale(1.05); }
@@ -647,14 +692,15 @@
         /* --- SIMILAR / ALTERNATIVE PRODUCTS CAROUSEL --- */
         .similar-scroll {
             display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin;
+            max-width: 100%; min-width: 0;
         }
         .similar-card {
-            min-width: 175px; max-width: 175px; background: var(--md-sys-color-surface-container);
+            min-width: 162px; max-width: 162px; flex-shrink: 0; background: var(--md-sys-color-surface-container);
             border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--border-radius-medium);
-            padding: 12px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: var(--transition-standard);
+            padding: 10px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: var(--transition-standard);
         }
         .similar-card:hover { border-color: var(--md-sys-color-primary); transform: translateY(-2px); }
-        .similar-card img { width: 100%; height: 80px; object-fit: contain; background: #fff; border-radius: 10px; padding: 4px; }
+        .similar-card img { width: 100%; height: 74px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; }
         .similar-title { font-size: 12px; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 34px; }
         .similar-price { font-size: 15px; font-weight: 700; color: var(--md-sys-color-primary); margin-top: auto; }
         .similar-unit { font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
@@ -662,11 +708,13 @@
         /* --- NUTRITION SECTION --- */
         .nutrition-card {
             background: var(--md-sys-color-surface-container-low); border-radius: var(--border-radius-medium);
-            padding: 16px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 16px;
+            padding: 12px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 14px;
+            max-width: 100%; overflow-x: auto;
         }
-        .traffic-lights { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 14px; }
+        .traffic-lights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        @media (min-width: 500px) { .traffic-lights { grid-template-columns: repeat(4, 1fr); } }
         .tl-item {
-            padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px;
+            padding: 9px 6px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
         }
         .tl-item.low { background: #D6F5E3; color: #004E36; }
         .tl-item.moderate { background: #FFDCBC; color: #5E3400; }
@@ -675,28 +723,28 @@
         [data-theme="dark"] .tl-item.moderate { background: #522E00; color: #FFCC99; }
         [data-theme="dark"] .tl-item.high { background: #631215; color: #FFB4AB; }
         .tl-name { font-size: 11px; font-weight: 600; }
-        .tl-val { font-size: 15px; font-weight: 700; }
+        .tl-val { font-size: 14px; font-weight: 700; }
         .tl-lvl { font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.9; }
 
         .nutri-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .nutri-table th, .nutri-table td { padding: 8px 6px; border-bottom: 1px solid var(--md-sys-color-outline-variant); text-align: left; }
+        .nutri-table th, .nutri-table td { padding: 7px 4px; border-bottom: 1px solid var(--md-sys-color-outline-variant); text-align: left; }
         .nutri-table th:not(:first-child), .nutri-table td:not(:first-child) { text-align: right; }
         .nutri-table tr:last-child td { border-bottom: none; }
 
         /* --- ACCORDION --- */
-        .accordion { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .accordion { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; width: 100%; min-width: 0; }
         .acc-item { background-color: var(--md-sys-color-surface-container-low); border-radius: var(--border-radius-medium); overflow: hidden; border: 1px solid var(--md-sys-color-outline-variant); }
         .acc-header {
-            padding: 15px 18px; display: flex; align-items: center; justify-content: space-between;
+            padding: 13px 14px; display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; font-weight: 500; color: var(--md-sys-color-on-surface); transition: var(--transition-standard);
         }
         .acc-header:hover { background-color: var(--md-sys-color-surface-container-high); }
-        .acc-header .title-box { display: flex; align-items: center; gap: 10px; }
+        .acc-header .title-box { display: flex; align-items: center; gap: 9px; }
         .acc-header .material-symbols-rounded { color: var(--md-sys-color-primary); }
         .acc-icon-arrow { transition: transform 0.3s; }
         .acc-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-in-out; }
         .acc-content-inner { overflow: hidden; }
-        .acc-body { padding: 0 18px 18px 18px; color: var(--md-sys-color-on-surface-variant); font-size: 14px; line-height: 1.6; }
+        .acc-body { padding: 0 14px 14px 14px; color: var(--md-sys-color-on-surface-variant); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word; }
         .acc-item.active .acc-content { grid-template-rows: 1fr; }
         .acc-item.active .acc-icon-arrow { transform: rotate(180deg); }
         .allergen-text { color: var(--md-sys-color-error); font-weight: 700; background: var(--md-sys-color-error-container); padding: 2px 7px; border-radius: 6px; display: inline-block; margin: 2px; }
@@ -710,7 +758,7 @@
             transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1), opacity 0.35s, visibility 0.35s;
         }
         .camera-modal.active { transform: translateY(0); visibility: visible; opacity: 1; }
-        .camera-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: var(--md-sys-color-surface-container); }
+        .camera-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background-color: var(--md-sys-color-surface-container); }
         .camera-header h2 { font-size: 18px; font-weight: 500; }
         #reader { flex: 1; width: 100%; background: #000; overflow: hidden; position: relative; }
         #reader video { object-fit: cover !important; }
@@ -718,52 +766,51 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.55);
             z-index: 2500; display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: 0.25s; padding: 12px;
+            opacity: 0; visibility: hidden; transition: 0.25s; padding: 10px;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .settings-dialog {
             background-color: var(--md-sys-color-surface-container-high); width: 100%; max-width: 440px;
             max-height: 90vh; display: flex; flex-direction: column;
-            border-radius: var(--border-radius-large); padding: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            border-radius: var(--border-radius-large); padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
             transform: scale(0.94); transition: 0.25s cubic-bezier(0.2, 0, 0, 1); overflow-y: auto;
         }
         .modal-overlay.active .settings-dialog { transform: scale(1); }
-        .dialog-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); margin-bottom: 16px; }
+        .dialog-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); margin-bottom: 14px; }
         
-        /* Cart & Multi-Tab Modal */
-        .cart-dialog { max-width: 600px; height: 88vh; padding: 20px; overflow: hidden; }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cart-dialog { max-width: 600px; height: 88vh; padding: 16px; overflow: hidden; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .m3-tabs {
-            display: flex; background: var(--md-sys-color-surface-container); border-radius: 12px; padding: 4px; margin-bottom: 12px; gap: 4px;
+            display: flex; background: var(--md-sys-color-surface-container); border-radius: 12px; padding: 4px; margin-bottom: 10px; gap: 4px;
         }
         .m3-tab {
-            flex: 1; border: none; background: transparent; padding: 9px 10px; border-radius: 9px;
+            flex: 1; border: none; background: transparent; padding: 8px 10px; border-radius: 9px;
             font-size: 13px; font-weight: 600; color: var(--md-sys-color-on-surface-variant); cursor: pointer; transition: 0.2s;
         }
         .m3-tab.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
 
         .cart-items-container { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 2px; }
-        .cart-item-row { display: flex; align-items: center; gap: 12px; background: var(--md-sys-color-surface-container); padding: 10px; border-radius: 14px; }
-        .cart-item-img { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; background: #fff; padding: 2px; }
+        .cart-item-row { display: flex; align-items: center; gap: 10px; background: var(--md-sys-color-surface-container); padding: 10px; border-radius: 12px; }
+        .cart-item-img { width: 46px; height: 46px; object-fit: contain; border-radius: 8px; background: #fff; padding: 2px; flex-shrink: 0; }
         .cart-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
         .cart-item-title { font-size: 13px; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .cart-item-market { font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
         .cart-item-market-logo { height: 15px; max-width: 60px; object-fit: contain; align-self: flex-start; }
         .cart-item-price { font-weight: 700; font-size: 14px; color: var(--md-sys-color-primary); }
-        .cart-item-actions { display: flex; align-items: center; gap: 6px; }
+        .cart-item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .cart-qty-btn { background: var(--md-sys-color-surface-variant); border: none; border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; color: var(--md-sys-color-on-surface); }
         .cart-qty { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
-        .cart-footer { border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .cart-footer { border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 
         .opt-market-card {
-            background: var(--md-sys-color-surface-container); border-radius: 14px; padding: 12px 14px;
+            background: var(--md-sys-color-surface-container); border-radius: 12px; padding: 12px;
             display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--md-sys-color-outline-variant);
         }
         .opt-market-card.best { background: var(--md-sys-color-primary-container); border-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary-container); }
 
-        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); gap: 8px; }
         .setting-item:last-child { border-bottom: none; }
-        .setting-text { display: flex; flex-direction: column; gap: 2px; padding-right: 12px; }
+        .setting-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .setting-title { font-size: 15px; font-weight: 500; color: var(--md-sys-color-on-surface); }
         .setting-desc { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
         
@@ -775,15 +822,15 @@
         }
         .diet-chip.selected { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
 
-        .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+        .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
         .btn-text {
             background: transparent; border: none; color: var(--md-sys-color-primary); font-size: 14px;
-            font-weight: 600; padding: 9px 14px; border-radius: 20px; cursor: pointer; transition: 0.2s;
+            font-weight: 600; padding: 8px 12px; border-radius: 20px; cursor: pointer; transition: 0.2s;
         }
         .btn-text:hover { background-color: var(--md-sys-color-surface-variant); }
         .btn-primary { 
             background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); 
-            border: none; padding: 10px 18px; border-radius: 20px; font-size: 14px; 
+            border: none; padding: 10px 16px; border-radius: 20px; font-size: 14px; 
             font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
         }
         .btn-primary:hover { opacity: 0.92; }
@@ -807,11 +854,11 @@
 
         /* --- SNACKBAR --- */
         .snackbar {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
             background-color: var(--md-sys-color-on-surface); color: var(--md-sys-color-surface);
-            padding: 12px 20px; border-radius: 12px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            padding: 11px 18px; border-radius: 12px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             z-index: 3000; display: flex; align-items: center; gap: 10px;
-            opacity: 0; visibility: hidden; max-width: 90%;
+            opacity: 0; visibility: hidden; max-width: 92%;
             transition: all 0.28s cubic-bezier(0.2, 0, 0, 1);
         }
         .snackbar.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; }
@@ -822,35 +869,35 @@
             z-index: 2600; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.25s;
         }
         .img-modal.active { display: flex; opacity: 1; }
-        .img-modal img { max-width: 90%; max-height: 88%; border-radius: 16px; background: #fff; padding: 8px; }
-        .img-modal-close { position: absolute; top: 20px; right: 20px; color: white; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; width: 46px; height: 46px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .img-modal img { max-width: 92%; max-height: 88%; border-radius: 16px; background: #fff; padding: 8px; }
+        .img-modal-close { position: absolute; top: 18px; right: 18px; color: white; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         /* --- A2HS POPUP --- */
         .a2hs-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%);
+            position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(150%);
             background-color: var(--md-sys-color-surface-container-high);
-            border-radius: var(--border-radius-medium); padding: 16px;
+            border-radius: var(--border-radius-medium); padding: 14px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.22); z-index: 3500;
-            width: 92%; max-width: 400px; display: flex; flex-direction: column; gap: 14px;
+            width: 92%; max-width: 400px; display: flex; flex-direction: column; gap: 12px;
             visibility: hidden; opacity: 0; transition: all 0.35s cubic-bezier(0.2, 0, 0, 1);
         }
         .a2hs-popup.show { transform: translateX(-50%) translateY(0); visibility: visible; opacity: 1; }
-        .a2hs-content { display: flex; align-items: center; gap: 14px; }
-        .a2hs-icon { width: 46px; height: 46px; object-fit: contain; }
-        .a2hs-text { display: flex; flex-direction: column; gap: 3px; }
+        .a2hs-content { display: flex; align-items: center; gap: 12px; }
+        .a2hs-icon { width: 44px; height: 44px; object-fit: contain; }
+        .a2hs-text { display: flex; flex-direction: column; gap: 2px; }
         .a2hs-title { font-weight: 600; font-size: 15px; }
         .a2hs-desc { font-size: 12px; color: var(--md-sys-color-on-surface-variant); line-height: 1.4; }
         .a2hs-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-        .footer { text-align: center; padding: 28px 16px; margin-top: auto; border-top: 1px solid var(--md-sys-color-surface-variant); }
-        .footer-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .footer { text-align: center; padding: 24px 12px; margin-top: auto; border-top: 1px solid var(--md-sys-color-surface-variant); }
+        .footer-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         .footer-links img { height: 34px; border-radius: 8px; transition: transform 0.2s; }
         .footer-links img:hover { transform: scale(1.05); }
 
         @media (max-width: 600px) {
-            .product-header { flex-direction: column; text-align: center; padding-top: 34px; }
+            .product-header { flex-direction: column; text-align: center; padding-top: 32px; }
             .product-meta-row { justify-content: center; }
-            .price-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .price-item { flex-direction: column; align-items: flex-start; gap: 8px; }
             .price-value-box { justify-content: space-between; width: 100%; }
             .price-info-inner { align-items: flex-start; }
             .results-grid { grid-template-columns: 1fr; }
@@ -863,7 +910,6 @@
         <div class="brand" id="brandHome">
             <img src="./nutriturk-logo.png" alt="NutriTürk" class="brand-logo" onerror="this.style.display='none'">
             <h1>NutriTürk</h1>
-            <span class="brand-tag">PRO</span>
         </div>
         <div class="app-actions">
             <button class="icon-btn" id="btnFavorites" title="Favorilerim">
@@ -890,7 +936,6 @@
                     <span class="material-symbols-rounded">location_on</span>
                     <span id="locationPillText">Konum: Tüm Türkiye</span>
                 </button>
-                <span style="font-size: 12px; color: var(--md-sys-color-on-surface-variant);" id="apiMarketBadge">7 Zincir Market • Canlı Veri</span>
             </div>
 
             <div class="search-bar-wrapper">
@@ -994,7 +1039,7 @@
             </div>
 
             <!-- Tahmini Fiyat (OFF Prices) -->
-            <div id="userPriceWrapper" style="display:none; margin-bottom: 20px;">
+            <div id="userPriceWrapper" style="display:none; margin-bottom: 16px;">
                 <div class="section-header-row">
                     <h3 class="section-title"><span class="material-symbols-rounded">person</span> Tahmini Topluluk Fiyatı</h3>
                 </div>
@@ -1005,16 +1050,20 @@
             <div id="priceSectionWrapper" style="display:none;">
                 <div class="section-header-row">
                     <h3 class="section-title"><span class="material-symbols-rounded">storefront</span> Market Fiyatları & Şubeler</h3>
-                    <select class="m3-select" id="depotSortSelect" style="font-size:12px; padding:5px 10px;">
+                    <select class="m3-select" id="depotSortSelect" style="font-size:12px; padding:5px 8px;">
                         <option value="price_asc">En Ucuz Önce</option>
                         <option value="dist_asc" id="optSortDist" style="display:none;">En Yakın Önce</option>
                     </select>
+                </div>
+                <div class="location-note-banner" id="locationNoteBanner">
+                    <span id="locationNoteText"></span>
+                    <button class="location-note-btn" id="btnToggleFarDepots" style="display:none;"></button>
                 </div>
                 <div class="price-list" id="pPrices"></div>
             </div>
 
             <!-- Benzer / Alternatif Ürünler -->
-            <div id="similarSectionWrapper" style="display:none; margin-top: 22px;">
+            <div id="similarSectionWrapper" style="display:none; margin-top: 18px;">
                 <div class="section-header-row">
                     <h3 class="section-title"><span class="material-symbols-rounded">compare_arrows</span> Benzer & Alternatif Ürünler</h3>
                 </div>
@@ -1022,7 +1071,7 @@
             </div>
 
             <!-- Besin Değerleri & Trafik Işıkları -->
-            <div id="nutritionSectionWrapper" style="display:none; margin-top: 22px;">
+            <div id="nutritionSectionWrapper" style="display:none; margin-top: 18px;">
                 <div class="section-header-row">
                     <h3 class="section-title"><span class="material-symbols-rounded">nutrition</span> Besin Değerleri</h3>
                     <span style="font-size:12px; color:var(--md-sys-color-on-surface-variant);" id="servingSizeLabel"></span>
@@ -1053,7 +1102,7 @@
         <div class="settings-dialog">
             <h3 class="dialog-title">Konum & Arama Yarıçapı</h3>
             <p style="font-size:13px; color:var(--md-sys-color-on-surface-variant); margin-bottom:14px;">
-                Konumunuzu seçerek yakınınızdaki market şubelerini (BİM, A101, ŞOK, Migros vb.) ve şube mesafelerini görebilirsiniz.
+                Konumunuzu seçtiğinizde yalnızca seçtiğiniz yarıçap içindeki yakın market şubeleri öncelikli olarak filtrelenir.
             </p>
             <button class="btn-primary" id="btnUseGps" style="width:100%; justify-content:center; margin-bottom:14px;">
                 <span class="material-symbols-rounded" style="font-size:20px;">my_location</span>
@@ -1081,7 +1130,7 @@
             <div class="setting-item">
                 <div class="setting-text">
                     <span class="setting-title">Arama Mesafesi</span>
-                    <span class="setting-desc">Şubelerin taranacağı yarıçap</span>
+                    <span class="setting-desc">Şubelerin filtreleneceği yarıçap</span>
                 </div>
                 <select class="m3-select" id="distanceSelect">
                     <option value="2">2 km</option>
@@ -1162,10 +1211,10 @@
             <div class="cart-items-container" id="cartItems"></div>
             <div class="cart-items-container" id="cartOptimizeView" style="display:none;"></div>
             <div class="cart-footer">
-                <div style="font-size: 17px; font-weight: 700; color: var(--md-sys-color-on-surface);">
+                <div style="font-size: 16px; font-weight: 700; color: var(--md-sys-color-on-surface);">
                     Toplam: <span id="cartTotal" style="color: var(--md-sys-color-primary);">₺0.00</span>
                 </div>
-                <div style="display:flex; gap:6px;">
+                <div style="display:flex; gap:4px;">
                     <button class="btn-text" id="btnShareCart">Paylaş</button>
                     <button class="btn-text" id="btnClearCart" style="color: var(--md-sys-color-error);">Boşalt</button>
                 </div>
@@ -1188,7 +1237,7 @@
     <div class="camera-modal" id="cameraModal">
         <div class="camera-header">
             <h2>Barkod Okutun</h2>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:4px;">
                 <button class="icon-btn" id="btnCameraTorch" title="Fener" style="display:none;">
                     <span class="material-symbols-rounded" id="torchIcon">flashlight_off</span>
                 </button>
@@ -1227,14 +1276,12 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        // PWA Service Worker Kaydı
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW:', err));
             });
         }
         
-        // PWA - Ana Ekrana Ekleme (A2HS)
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -1274,7 +1321,6 @@
                 "carrefour": "CarrefourSA", "tarim_kredi": "Tarım Kredi", "hakmar": "Hakmar"
             };
 
-            // Uygulama Durumu (State)
             let boycottList = [];
             let safeList = [];
             let cart = JSON.parse(localStorage.getItem('nutriturk_cart') || '[]');
@@ -1289,7 +1335,8 @@
 
             let currentSearchResults = [];
             let activeMarketFilter = 'all';
-            let currentProductContext = null; // Aktif görüntülenen ürünün tam bağlamı
+            let currentProductContext = null;
+            let showAllFarDepots = false;
             let html5QrCode = null;
             let isTorchOn = false;
             let snackbarTimer = null;
@@ -1342,7 +1389,6 @@
                 depotSortSelect: document.getElementById('depotSortSelect')
             };
 
-            // Başlatma
             initTheme();
             els.toggleUserPrice.checked = isUserPriceEnabled;
             els.toggleBoycottCheck.checked = isBoycottCheckEnabled;
@@ -1355,7 +1401,6 @@
             renderHistory();
             loadBoycottLists();
 
-            // --- YARDIMCI FONKSİYONLAR ---
             function escapeHtml(str) {
                 if (str === null || str === undefined) return '';
                 return String(str)
@@ -1504,11 +1549,35 @@
             function saveLocation() {
                 localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
                 updateLocationUI();
+                // Eğer halihazırda bir ürün veya liste açıksa mesafe filtresini anında güncelle
+                if (currentProductContext && els.resultContainer.classList.contains('show')) {
+                    showAllFarDepots = false;
+                    renderPriceAnalyticsAndDepots(currentProductContext.market);
+                } else if (currentSearchResults.length > 1 && els.searchResultsSection.classList.contains('show')) {
+                    renderSearchResultsGrid(currentSearchResults.length);
+                }
             }
 
             els.btnLocationModal.addEventListener('click', () => openModal(els.locationModal));
             els.btnLocationClose.addEventListener('click', () => closeModal(els.locationModal));
             els.locationModal.addEventListener('click', (e) => { if (e.target === els.locationModal) closeModal(els.locationModal); });
+
+            async function reverseGeocodeLabel(lat, lng) {
+                try {
+                    const ctrl = new AbortController();
+                    const timer = setTimeout(() => ctrl.abort(), 3500);
+                    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=tr`, { signal: ctrl.signal });
+                    clearTimeout(timer);
+                    if (r.ok) {
+                        const d = await r.json();
+                        const district = d.locality || d.cityDistrict || '';
+                        const city = d.principalSubdivision || d.city || '';
+                        if (district && city && district !== city) return `${district}, ${city}`;
+                        if (district || city) return district || city;
+                    }
+                } catch {}
+                return 'Konumum';
+            }
 
             els.btnUseGps.addEventListener('click', () => {
                 if (!navigator.geolocation) {
@@ -1516,24 +1585,27 @@
                     return;
                 }
                 els.btnUseGps.disabled = true;
-                showSnackbar('Konum alınıyor...', 'info');
+                showSnackbar('GPS konumu alınıyor...', 'info');
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        userLocation.lat = pos.coords.latitude;
-                        userLocation.lng = pos.coords.longitude;
-                        userLocation.label = 'Konumum';
+                    async (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const label = await reverseGeocodeLabel(lat, lng);
+                        userLocation.lat = lat;
+                        userLocation.lng = lng;
+                        userLocation.label = label;
                         userLocation.distance = parseInt(els.distanceSelect.value, 10) || 5;
                         saveLocation();
                         els.cityPresetSelect.value = "";
                         els.btnUseGps.disabled = false;
                         closeModal(els.locationModal);
-                        showSnackbar('GPS konumu aktif edildi!', 'info');
+                        showSnackbar(`Konum güncellendi: ${label}`, 'info');
                     },
                     () => {
                         els.btnUseGps.disabled = false;
                         showSnackbar('Konum izni alınamadı. Şehir seçebilirsiniz.', 'error');
                     },
-                    { enableHighAccuracy: true, timeout: 10000 }
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
                 );
             });
 
@@ -1563,16 +1635,14 @@
                 showSnackbar('Konum sıfırlandı (Tüm Türkiye).', 'info');
             });
 
-            // --- AYARLAR & İKON ÖNBELLEK DURUMU ---
+            // --- AYARLAR & İKON ÖNBELLEK ---
             async function updateIconCacheStatusUI() {
                 const statusEl = document.getElementById('iconCacheStatusText');
                 if (!window.NutriIconCache) return;
                 const info = await window.NutriIconCache.status();
-                if (info.cached) {
-                    statusEl.textContent = `Önbellekte hazır (${info.sizeKB} KB) • Çevrimdışı aktif`;
-                } else {
-                    statusEl.textContent = 'Henüz önbelleğe alınmadı (ilk yükleme bekleniyor)';
-                }
+                statusEl.textContent = info.cached
+                    ? `Önbellekte hazır (${info.sizeKB} KB) • Çevrimdışı aktif`
+                    : 'Henüz önbelleğe alınmadı';
             }
 
             els.btnSettings.addEventListener('click', () => {
@@ -1586,7 +1656,7 @@
                 showSnackbar('MD3 ikon önbelleği yenileniyor...', 'info');
                 const ok = await window.NutriIconCache.refresh();
                 await updateIconCacheStatusUI();
-                showSnackbar(ok ? 'MD3 ikonları güncellendi ve hafızaya alındı!' : 'İkon önbelleği yenilenemedi.', ok ? 'info' : 'error');
+                showSnackbar(ok ? 'MD3 ikonları güncellendi!' : 'Önbellek yenilenemedi.', ok ? 'info' : 'error');
             });
 
             els.toggleUserPrice.addEventListener('change', (e) => {
@@ -1636,8 +1706,22 @@
                     if (bRes.ok && sRes.ok) {
                         boycottList = (await bRes.text()).split('\n').map(normalizeForSearch).filter(Boolean);
                         safeList = (await sRes.text()).split('\n').map(normalizeForSearch).filter(Boolean);
+                        // Eğer liste yüklendiğinde sonuçlar ekrandaysa rozetleri güncelle
+                        if (currentSearchResults.length > 0 && els.searchResultsSection.classList.contains('show')) {
+                            renderSearchResultsGrid(currentSearchResults.length);
+                        }
                     }
                 } catch {}
+            }
+
+            function getBoycottStatus(brandName, productName) {
+                if (!isBoycottCheckEnabled) return null;
+                const combined = normalizeForSearch(`${brandName || ''} ${productName || ''}`);
+                if (!combined) return null;
+                const padded = ` ${combined} `;
+                if (boycottList.some(item => padded.includes(` ${item} `))) return 'boycott';
+                if (safeList.some(item => padded.includes(` ${item} `))) return 'safe';
+                return null;
             }
 
             function checkBoycott(brandName, productName) {
@@ -1646,19 +1730,15 @@
                 header.classList.remove('boycott-active', 'boycott-safe');
                 badge.classList.remove('visible');
 
-                if (!isBoycottCheckEnabled) return null;
-                const combined = normalizeForSearch(`${brandName || ''} ${productName || ''}`);
-                if (!combined) return null;
-                const padded = ` ${combined} `;
-
-                if (boycottList.some(item => padded.includes(` ${item} `))) {
+                const status = getBoycottStatus(brandName, productName);
+                if (status === 'boycott') {
                     document.getElementById('boycottText').textContent = 'Boykot';
                     document.getElementById('boycottIcon').textContent = 'block';
                     badge.className = 'boycott-badge boycott visible';
                     header.classList.add('boycott-active');
                     return 'Boykot';
                 }
-                if (safeList.some(item => padded.includes(` ${item} `))) {
+                if (status === 'safe') {
                     document.getElementById('boycottText').textContent = 'Boykot Değil';
                     document.getElementById('boycottIcon').textContent = 'check_circle';
                     badge.className = 'boycott-badge safe visible';
@@ -1778,11 +1858,8 @@
 
                 const isBarcode = /^\d{8,13}$/.test(val);
                 try {
-                    if (isBarcode) {
-                        await openBarcodeProduct(val);
-                    } else {
-                        await performKeywordSearch(val);
-                    }
+                    if (isBarcode) await openBarcodeProduct(val);
+                    else await performKeywordSearch(val);
                 } catch (err) {
                     console.error(err);
                     playBeep(false);
@@ -1793,12 +1870,10 @@
 
             async function openBarcodeProduct(barcode) {
                 let marketData = null;
-                let fellBackToTurkey = false;
                 try {
                     let json = await queryMarketIdentity(barcode, "barcode", true);
                     if ((!json.content || json.content.length === 0) && userLocation.lat !== null) {
                         json = await queryMarketIdentity(barcode, "barcode", false);
-                        fellBackToTurkey = true;
                     }
                     if (json.content && json.content.length > 0) marketData = json.content[0];
                 } catch {}
@@ -1813,11 +1888,8 @@
                     return;
                 }
 
-                if (fellBackToTurkey && marketData) {
-                    showSnackbar('Yakınınızda bulunamadı, Türkiye geneli gösteriliyor.', 'info');
-                }
-
                 els.btnBackToResults.classList.remove('visible');
+                showAllFarDepots = false;
                 await renderProduct(marketData, offData, offUserPriceData, barcode);
             }
 
@@ -1840,9 +1912,7 @@
                     return;
                 }
 
-                if (fellBack) {
-                    showSnackbar('Yakınınızda sonuç bulunamadı, Türkiye geneli listeleniyor.', 'info');
-                }
+                if (fellBack) showSnackbar('Yakınınızda sonuç bulunamadı, Türkiye geneli listeleniyor.', 'info');
 
                 currentSearchResults = json.content;
                 activeMarketFilter = 'all';
@@ -1859,16 +1929,27 @@
                 playBeep(true);
             }
 
+            // Konum aktifse ürünün şubelerini yerel mesafeye göre süz (yoksa tümünü kullan)
+            function getEffectiveDepotsForCard(depots) {
+                if (!depots || depots.length === 0) return [];
+                if (userLocation.lat === null || userLocation.lng === null) return depots;
+                const nearby = depots.filter(d => {
+                    const dist = calcDistanceKm(userLocation.lat, userLocation.lng, d.latitude, d.longitude);
+                    return dist !== null && dist <= (userLocation.distance || 5);
+                });
+                return nearby.length > 0 ? nearby : depots;
+            }
+
             function getProductMinPrice(item) {
-                if (!item.productDepotInfoList || item.productDepotInfoList.length === 0) return Infinity;
-                return Math.min(...item.productDepotInfoList.map(d => parseFloat(d.price)));
+                const depots = getEffectiveDepotsForCard(item.productDepotInfoList);
+                if (depots.length === 0) return Infinity;
+                return Math.min(...depots.map(d => parseFloat(d.price)));
             }
 
             function renderSearchResultsGrid(totalFound) {
-                // Mevcut sonuçlardaki marketleri topla
                 const marketsPresent = new Set();
                 currentSearchResults.forEach(item => {
-                    (item.productDepotInfoList || []).forEach(d => {
+                    getEffectiveDepotsForCard(item.productDepotInfoList).forEach(d => {
                         const k = getMarketKey(d.marketAdi);
                         if (k) marketsPresent.add(k);
                     });
@@ -1882,28 +1963,56 @@
                 let filtered = [...currentSearchResults];
                 if (activeMarketFilter !== 'all') {
                     filtered = filtered.filter(item =>
-                        (item.productDepotInfoList || []).some(d => getMarketKey(d.marketAdi) === activeMarketFilter)
+                        getEffectiveDepotsForCard(item.productDepotInfoList).some(d => getMarketKey(d.marketAdi) === activeMarketFilter)
                     );
                 }
 
                 const sortVal = els.resultsSortSelect.value;
                 if (sortVal === 'price_asc') filtered.sort((a, b) => getProductMinPrice(a) - getProductMinPrice(b));
                 else if (sortVal === 'price_desc') filtered.sort((a, b) => getProductMinPrice(b) - getProductMinPrice(a));
-                else if (sortVal === 'markets_desc') filtered.sort((a, b) => (b.productDepotInfoList?.length || 0) - (a.productDepotInfoList?.length || 0));
+                else if (sortVal === 'markets_desc') filtered.sort((a, b) => getEffectiveDepotsForCard(b.productDepotInfoList).length - getEffectiveDepotsForCard(a.productDepotInfoList).length);
 
-                els.resultsCountText.textContent = `${filtered.length} ürün gösteriliyor (Toplam ${totalFound} eşleşme)`;
+                els.resultsCountText.textContent = `${filtered.length} ürün gösteriliyor (${totalFound} eşleşme)`;
                 els.resultsGrid.innerHTML = '';
 
                 filtered.forEach(item => {
-                    const depots = item.productDepotInfoList || [];
+                    const depots = getEffectiveDepotsForCard(item.productDepotInfoList);
                     const sortedDepots = [...depots].sort((a, b) => a.price - b.price);
                     const minDepot = sortedDepots[0];
                     const minPrice = minDepot ? parseFloat(minDepot.price).toFixed(2) : null;
-                    const uniqueMarkets = new Set(depots.map(d => getMarketKey(d.marketAdi) || d.marketAdi)).size;
+
+                    // Benzersiz market logolarını yan yana topla
+                    const seenMarketKeys = new Set();
+                    const marketBadgesHtml = [];
+                    sortedDepots.forEach(d => {
+                        const mkKey = getMarketKey(d.marketAdi);
+                        const uniq = mkKey || d.marketAdi;
+                        if (!seenMarketKeys.has(uniq)) {
+                            seenMarketKeys.add(uniq);
+                            if (mkKey && MARKET_LOGOS[mkKey]) {
+                                marketBadgesHtml.push(`<span class="pg-mk-pill"><img src="${MARKET_LOGOS[mkKey]}" class="pg-mk-logo" alt="${escapeHtml(d.marketAdi)}"></span>`);
+                            } else {
+                                marketBadgesHtml.push(`<span class="pg-mk-pill"><span class="pg-mk-txt">${escapeHtml(d.marketAdi)}</span></span>`);
+                            }
+                        }
+                    });
+
+                    // Boykot durumu (sağ üst köşe rozeti)
+                    const bStatus = getBoycottStatus(item.brand, item.title);
+                    let cornerBadgeHtml = '';
+                    let statusClass = '';
+                    if (bStatus === 'boycott') {
+                        statusClass = 'pg-boycott has-badge';
+                        cornerBadgeHtml = `<div class="pg-corner-badge boycott"><span class="material-symbols-rounded">block</span>Boykot</div>`;
+                    } else if (bStatus === 'safe') {
+                        statusClass = 'pg-safe has-badge';
+                        cornerBadgeHtml = `<div class="pg-corner-badge safe"><span class="material-symbols-rounded">check_circle</span>Boykot Değil</div>`;
+                    }
 
                     const card = document.createElement('div');
-                    card.className = 'product-grid-card';
+                    card.className = `product-grid-card ${statusClass}`;
                     card.innerHTML = `
+                        ${cornerBadgeHtml}
                         <div class="pg-top">
                             <img src="${escapeHtml(item.imageUrl || DEFAULT_IMG_URL)}" onerror="this.src='${DEFAULT_IMG_URL}'" alt="" class="pg-img">
                             <div class="pg-meta">
@@ -1914,11 +2023,11 @@
                         </div>
                         <div class="pg-bottom">
                             <div class="pg-price-col">
-                                <span class="pg-min-label">En düşük fiyat</span>
+                                <span class="pg-min-label">En düşük</span>
                                 <span class="pg-price">${minPrice ? `₺${minPrice}` : 'Fiyat yok'}</span>
                                 ${minDepot?.unitPrice ? `<span class="pg-unit">${escapeHtml(minDepot.unitPrice)}</span>` : ''}
                             </div>
-                            <span class="pg-market-count">${uniqueMarkets} market</span>
+                            <div class="pg-market-logos">${marketBadgesHtml.join('')}</div>
                         </div>
                     `;
                     card.addEventListener('click', () => openSelectedMarketItem(item, true));
@@ -1941,14 +2050,23 @@
 
             async function openSelectedMarketItem(item, fromResultsList) {
                 setUiState('loading');
+                showAllFarDepots = false;
                 let fullMarketData = item;
-                // Eğer id veya barcode varsa daha detaylı şube listesi için searchByIdentity dene
+
                 if (item.id) {
                     try {
                         const res = await queryMarketIdentity(item.id, "id", true);
-                        if (res.content && res.content.length > 0) fullMarketData = res.content[0];
+                        if (res.content && res.content.length > 0) {
+                            const idItem = res.content[0];
+                            // /search'ten gelen yerel şubelerle /searchByIdentity şubelerini depotId bazında birleştir
+                            const mergedMap = new Map();
+                            (item.productDepotInfoList || []).forEach(d => mergedMap.set(d.depotId || `${d.marketAdi}_${d.depotName}`, d));
+                            (idItem.productDepotInfoList || []).forEach(d => mergedMap.set(d.depotId || `${d.marketAdi}_${d.depotName}`, d));
+                            fullMarketData = { ...idItem, productDepotInfoList: Array.from(mergedMap.values()) };
+                        }
                     } catch {}
                 }
+
                 const barcode = fullMarketData.barcode || item.barcode || null;
                 const { offData, offUserPriceData } = await fetchOpenFoodFacts(barcode);
 
@@ -1976,7 +2094,6 @@
                 const finalImgUrl = (await checkImage(imgUrl)) ? imgUrl : DEFAULT_IMG_URL;
                 els.pImg.src = finalImgUrl;
 
-                // Aktif ürün bağlamını kaydet
                 currentProductContext = {
                     id: m?.id || barcode,
                     barcode,
@@ -1993,27 +2110,24 @@
                 updateFavoriteButtonUI();
                 evaluateDietWarnings(o);
                 renderHealthScoresAndTags(o);
-                renderPriceAnalyticsAndDepots(m, name, finalImgUrl);
-                renderUserOffPrice(offPrice, name, finalImgUrl);
+                renderPriceAnalyticsAndDepots(m);
+                renderUserOffPrice(offPrice);
                 renderNutritionSection(o);
                 renderDetailsAccordion(o, m);
 
                 playBeep(true);
                 setUiState('result');
 
-                // Benzer ürünleri arka planda yükle
                 loadSimilarProducts(name, m?.id);
 
-                // Sesli asistan
-                const cheapestVal = currentProductContext.depots.length > 0
-                    ? Math.min(...currentProductContext.depots.map(d => parseFloat(d.price)))
-                    : null;
+                const activeList = currentProductContext.visibleDepots || currentProductContext.depots || [];
+                const cheapestVal = activeList.length > 0 ? Math.min(...activeList.map(d => parseFloat(d.price))) : null;
                 let speechTxt = `${brand} ${name}. `;
                 if (cheapestVal) speechTxt += `En ucuz fiyat ${formatPriceForSpeech(cheapestVal)}.`;
                 setTimeout(() => speak(speechTxt), 400);
             }
 
-            function renderUserOffPrice(offPrice, name, finalImgUrl) {
+            function renderUserOffPrice(offPrice) {
                 const uPriceWrapper = document.getElementById('userPriceWrapper');
                 const uPriceCard = document.getElementById('uPriceCard');
                 uPriceWrapper.style.display = 'none';
@@ -2025,7 +2139,7 @@
                             <span class="up-val">₺${parseFloat(offPrice.price).toFixed(2)}</span>
                             <span class="up-date">Eklenme: ${escapeHtml(pDate)}</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap: 14px;">
+                        <div style="display:flex; align-items:center; gap: 12px;">
                             <span class="material-symbols-rounded">cloud_done</span>
                             <button class="add-to-cart-btn action-add-cart" title="Sepete Ekle" data-market="Tahmini Fiyat" data-price="${offPrice.price}">
                                 <span class="material-symbols-rounded" style="font-size:20px; pointer-events: none;">add_shopping_cart</span>
@@ -2036,12 +2150,15 @@
                 }
             }
 
-            function renderPriceAnalyticsAndDepots(m, name, finalImgUrl) {
+            function renderPriceAnalyticsAndDepots(m) {
                 const analyticsCard = document.getElementById('priceAnalyticsCard');
                 const paStats = document.getElementById('paStats');
                 const paSavings = document.getElementById('paSavingsBanner');
                 const priceWrapper = document.getElementById('priceSectionWrapper');
                 const optSortDist = document.getElementById('optSortDist');
+                const noteBanner = document.getElementById('locationNoteBanner');
+                const noteText = document.getElementById('locationNoteText');
+                const btnToggleFar = document.getElementById('btnToggleFarDepots');
 
                 const hasUserCoords = userLocation.lat !== null && userLocation.lng !== null;
                 optSortDist.style.display = hasUserCoords ? 'block' : 'none';
@@ -2052,17 +2169,55 @@
                 if (!m?.productDepotInfoList?.length) {
                     analyticsCard.classList.remove('visible');
                     priceWrapper.style.display = 'none';
+                    noteBanner.classList.remove('visible');
                     return;
                 }
 
-                // Mesafeleri önceden hesapla
-                const depots = m.productDepotInfoList.map(d => {
+                const allDepots = m.productDepotInfoList.map(d => {
                     const distKm = hasUserCoords ? calcDistanceKm(userLocation.lat, userLocation.lng, d.latitude, d.longitude) : null;
                     return { ...d, _price: parseFloat(d.price), _distKm: distKm };
                 });
 
-                currentProductContext.depots = depots;
-                const pricesOnly = depots.map(d => d._price);
+                currentProductContext.depots = allDepots;
+                let displayDepots = allDepots;
+
+                noteBanner.classList.remove('visible');
+                btnToggleFar.style.display = 'none';
+
+                if (hasUserCoords) {
+                    const radius = userLocation.distance || 5;
+                    const nearby = allDepots.filter(d => d._distKm !== null && d._distKm <= radius);
+                    const far = allDepots.filter(d => d._distKm === null || d._distKm > radius);
+
+                    if (nearby.length > 0) {
+                        if (!showAllFarDepots) {
+                            displayDepots = nearby;
+                        }
+                        if (far.length > 0) {
+                            noteText.textContent = showAllFarDepots
+                                ? `Tüm şubeler (${allDepots.length}) gösteriliyor.`
+                                : `${radius} km içindeki ${nearby.length} yakın şube gösteriliyor.`;
+                            btnToggleFar.textContent = showAllFarDepots ? `Sadece Yakınımdakiler (${nearby.length})` : `Uzak Şubeleri de Göster (+${far.length})`;
+                            btnToggleFar.style.display = 'inline-block';
+                            noteBanner.classList.add('visible');
+                        }
+                    } else {
+                        // Seçilen yarıçapta şube yoksa en yakın şubeleri mesafeye göre sıralayıp en yakın 12 şubeyi göster
+                        const sortedByDist = [...allDepots].sort((a, b) => (a._distKm ?? Infinity) - (b._distKm ?? Infinity));
+                        displayDepots = showAllFarDepots ? allDepots : sortedByDist.slice(0, 12);
+                        noteText.textContent = `${radius} km içinde şube bulunamadı. En yakın şubeler mesafeye göre gösteriliyor.`;
+                        if (allDepots.length > 12) {
+                            btnToggleFar.textContent = showAllFarDepots ? 'En Yakın 12 Şube' : `Tümünü Göster (${allDepots.length})`;
+                            btnToggleFar.style.display = 'inline-block';
+                        }
+                        noteBanner.classList.add('visible');
+                        if (!showAllFarDepots) els.depotSortSelect.value = 'dist_asc';
+                    }
+                }
+
+                currentProductContext.visibleDepots = displayDepots;
+
+                const pricesOnly = displayDepots.map(d => d._price);
                 const minP = Math.min(...pricesOnly);
                 const maxP = Math.max(...pricesOnly);
                 const avgP = pricesOnly.reduce((a, b) => a + b, 0) / pricesOnly.length;
@@ -2074,7 +2229,7 @@
                     <div class="pa-stat-box"><div class="pa-stat-label">Ortalama</div><div class="pa-stat-val">₺${avgP.toFixed(2)}</div></div>
                     <div class="pa-stat-box max"><div class="pa-stat-label">En Yüksek</div><div class="pa-stat-val">₺${maxP.toFixed(2)}</div></div>
                 `;
-                if (diff >= 0.5 && depots.length > 1) {
+                if (diff >= 0.5 && displayDepots.length > 1) {
                     paSavings.innerHTML = `<span class="material-symbols-rounded">savings</span><span>En ucuz marketten alarak <strong>₺${diff.toFixed(2)} (%${diffPct})</strong> tasarruf edebilirsiniz!</span>`;
                     paSavings.style.display = 'flex';
                 } else {
@@ -2082,19 +2237,24 @@
                 }
                 analyticsCard.classList.add('visible');
 
-                renderDepotsList(minP);
+                renderDepotsList(displayDepots, minP);
                 priceWrapper.style.display = 'block';
             }
 
-            function renderDepotsList(minP) {
+            document.getElementById('btnToggleFarDepots').addEventListener('click', () => {
+                showAllFarDepots = !showAllFarDepots;
+                if (currentProductContext?.market) renderPriceAnalyticsAndDepots(currentProductContext.market);
+            });
+
+            function renderDepotsList(depotsInput, minP) {
                 const priceList = document.getElementById('pPrices');
                 priceList.innerHTML = '';
-                const depots = [...(currentProductContext?.depots || [])];
+                const depots = [...depotsInput];
 
                 if (els.depotSortSelect.value === 'dist_asc') {
                     depots.sort((a, b) => (a._distKm ?? Infinity) - (b._distKm ?? Infinity) || a._price - b._price);
                 } else {
-                    depots.sort((a, b) => a._price - b._price);
+                    depots.sort((a, b) => a._price - b._price || (a._distKm ?? Infinity) - (b._distKm ?? Infinity));
                 }
 
                 depots.forEach(p => {
@@ -2135,9 +2295,10 @@
             }
 
             els.depotSortSelect.addEventListener('change', () => {
-                if (!currentProductContext?.depots?.length) return;
-                const minP = Math.min(...currentProductContext.depots.map(d => d._price));
-                renderDepotsList(minP);
+                const list = currentProductContext?.visibleDepots || currentProductContext?.depots || [];
+                if (list.length === 0) return;
+                const minP = Math.min(...list.map(d => d._price));
+                renderDepotsList(list, minP);
             });
 
             // --- BENZER / ALTERNATİF ÜRÜNLER ---
@@ -2147,19 +2308,20 @@
                 wrapper.style.display = 'none';
                 container.innerHTML = '';
 
-                // Ürün adından en anlamlı 2 kelimeyi çıkar
                 const words = productName.replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ\s]/g, ' ').trim().split(/\s+/).filter(w => w.length > 2);
                 if (words.length === 0) return;
                 const searchKw = words.slice(0, 2).join(' ');
 
                 try {
-                    const res = await queryMarketSearch(searchKw, 10, false);
+                    const res = await queryMarketSearch(searchKw, 10, true);
                     const items = (res.content || []).filter(it => it.id !== currentId && it.productDepotInfoList?.length > 0).slice(0, 8);
                     if (items.length === 0) return;
 
                     items.forEach(item => {
-                        const sorted = [...item.productDepotInfoList].sort((a, b) => a.price - b.price);
+                        const depots = getEffectiveDepotsForCard(item.productDepotInfoList);
+                        const sorted = [...depots].sort((a, b) => a.price - b.price);
                         const best = sorted[0];
+                        if (!best) return;
                         const card = document.createElement('div');
                         card.className = 'similar-card';
                         card.innerHTML = `
@@ -2171,7 +2333,7 @@
                         card.addEventListener('click', () => openSelectedMarketItem(item, false));
                         container.appendChild(card);
                     });
-                    wrapper.style.display = 'block';
+                    if (container.children.length > 0) wrapper.style.display = 'block';
                 } catch {}
             }
 
@@ -2191,27 +2353,15 @@
                 if (dietPrefs.includes('vegan') && (analysis.includes('en:non-vegan') || analysis.includes('en:maybe-vegan'))) {
                     warnings.push(analysis.includes('en:non-vegan') ? 'Vegan değildir' : 'Vegan olmayabilir');
                 }
-                if (dietPrefs.includes('palm_free') && analysis.includes('en:palm-oil')) {
-                    warnings.push('Palm yağı içerir');
-                }
-                if (dietPrefs.includes('low_sugar') && levels.sugars === 'high') {
-                    warnings.push('Yüksek şeker içerir');
-                }
-                if (dietPrefs.includes('low_salt') && levels.salt === 'high') {
-                    warnings.push('Yüksek tuz içerir');
-                }
-                if (dietPrefs.includes('gluten_free') && (allergens.includes('gluten') || ingText.includes('buğday') || ingText.includes('gluten'))) {
-                    warnings.push('Gluten içerebilir');
-                }
-                if (dietPrefs.includes('lactose_free') && (allergens.includes('milk') || allergens.includes('lactose') || ingText.includes('süt') || ingText.includes('laktoz'))) {
-                    warnings.push('Süt / Laktoz içerir');
-                }
-                if (dietPrefs.includes('nut_free') && (allergens.includes('nuts') || allergens.includes('peanut') || ingText.includes('fındık') || ingText.includes('yer fıstığı'))) {
-                    warnings.push('Fındık / Yer fıstığı içerebilir');
-                }
+                if (dietPrefs.includes('palm_free') && analysis.includes('en:palm-oil')) warnings.push('Palm yağı içerir');
+                if (dietPrefs.includes('low_sugar') && levels.sugars === 'high') warnings.push('Yüksek şeker içerir');
+                if (dietPrefs.includes('low_salt') && levels.salt === 'high') warnings.push('Yüksek tuz içerir');
+                if (dietPrefs.includes('gluten_free') && (allergens.includes('gluten') || ingText.includes('buğday') || ingText.includes('gluten'))) warnings.push('Gluten içerebilir');
+                if (dietPrefs.includes('lactose_free') && (allergens.includes('milk') || allergens.includes('lactose') || ingText.includes('süt') || ingText.includes('laktoz'))) warnings.push('Süt / Laktoz içerir');
+                if (dietPrefs.includes('nut_free') && (allergens.includes('nuts') || allergens.includes('peanut') || ingText.includes('fındık') || ingText.includes('yer fıstığı'))) warnings.push('Fındık / Yer fıstığı içerebilir');
 
                 if (warnings.length > 0) {
-                    textEl.innerHTML = `<strong>Kişisel Sağlık Uyarısı:</strong> Tercihlerinizle çakışan durum tespit edildi → <strong>${warnings.join(', ')}</strong>.`;
+                    textEl.innerHTML = `<strong>Kişisel Sağlık Uyarısı:</strong> Tercihlerinizle çakışan durum → <strong>${warnings.join(', ')}</strong>.`;
                     banner.classList.add('visible');
                 }
             }
@@ -2369,11 +2519,12 @@
             document.getElementById('btnShareProduct').addEventListener('click', async () => {
                 if (!currentProductContext) return;
                 const c = currentProductContext;
-                const minD = c.depots.length > 0 ? [...c.depots].sort((a, b) => a._price - b._price)[0] : null;
+                const activeDepots = c.visibleDepots || c.depots || [];
+                const minD = activeDepots.length > 0 ? [...activeDepots].sort((a, b) => a._price - b._price)[0] : null;
                 let text = `${c.brand ? c.brand + ' - ' : ''}${c.name}`;
                 if (minD) text += `\nEn ucuz: ₺${minD._price.toFixed(2)} (${minD.marketAdi})`;
                 if (c.boycottStatus) text += `\nBoykot Durumu: ${c.boycottStatus}`;
-                text += `\nNutriTürk Pro ile tarandı.`;
+                text += `\nNutriTürk ile tarandı.`;
 
                 if (navigator.share) {
                     try { await navigator.share({ title: c.name, text }); } catch {}
@@ -2408,9 +2559,8 @@
                     favorites.splice(idx, 1);
                     showSnackbar('Favorilerden çıkarıldı.', 'info');
                 } else {
-                    const minPrice = currentProductContext.depots.length > 0
-                        ? Math.min(...currentProductContext.depots.map(d => d._price))
-                        : null;
+                    const activeDepots = currentProductContext.visibleDepots || currentProductContext.depots || [];
+                    const minPrice = activeDepots.length > 0 ? Math.min(...activeDepots.map(d => d._price)) : null;
                     favorites.unshift({
                         key,
                         barcode: currentProductContext.barcode,
@@ -2467,11 +2617,8 @@
             document.addEventListener('click', (e) => {
                 const addBtn = e.target.closest('.action-add-cart');
                 if (addBtn && currentProductContext) {
-                    const market = addBtn.dataset.market;
-                    const price = parseFloat(addBtn.dataset.price);
-                    addToCartLogic(currentProductContext, market, price);
+                    addToCartLogic(currentProductContext, addBtn.dataset.market, parseFloat(addBtn.dataset.price));
                 }
-
                 const updateBtn = e.target.closest('.action-update-cart');
                 if (updateBtn) {
                     updateCartQtyLogic(updateBtn.dataset.id, parseInt(updateBtn.dataset.delta, 10));
@@ -2480,9 +2627,8 @@
 
             function addToCartLogic(ctx, market, price) {
                 const id = encodeURIComponent(ctx.name + '_' + market).replace(/%/g, '_');
-                // Tüm market fiyatlarını zincir bazında haritala (karşılaştırma için)
                 const marketMap = {};
-                (ctx.depots || []).forEach(d => {
+                (ctx.visibleDepots || ctx.depots || []).forEach(d => {
                     const k = getMarketKey(d.marketAdi) || d.marketAdi;
                     if (!marketMap[k] || d._price < marketMap[k]) marketMap[k] = d._price;
                 });
@@ -2492,15 +2638,7 @@
                     existing.quantity += 1;
                     existing.marketMap = marketMap;
                 } else {
-                    cart.push({
-                        id,
-                        name: ctx.name,
-                        market,
-                        price,
-                        quantity: 1,
-                        imgUrl: ctx.imgUrl,
-                        marketMap
-                    });
+                    cart.push({ id, name: ctx.name, market, price, quantity: 1, imgUrl: ctx.imgUrl, marketMap });
                 }
                 saveCart();
                 showSnackbar('Ürün sepete eklendi!', 'info');
@@ -2576,7 +2714,6 @@
                     return;
                 }
 
-                // Karma En Ucuz Toplam
                 let mixedBestTotal = 0;
                 const allMarketKeys = Object.keys(MARKET_DISPLAY_NAMES);
                 const marketTotals = {};
@@ -2635,7 +2772,6 @@
                 });
             }
 
-            // Sepet Sekmeleri
             document.querySelectorAll('[data-cart-tab]').forEach(tab => {
                 tab.addEventListener('click', () => {
                     document.querySelectorAll('[data-cart-tab]').forEach(t => t.classList.remove('active'));
@@ -2674,7 +2810,7 @@
                 }
             });
 
-            // --- KAMERA & FENER (TORCH) ---
+            // --- KAMERA & FENER ---
             els.btnScan.addEventListener('click', () => {
                 openModal(els.cameraModal);
                 isTorchOn = false;
@@ -2693,7 +2829,6 @@
                     },
                     undefined
                 ).then(() => {
-                    // Cihaz feneri destekliyorsa butonu göster
                     try {
                         const caps = html5QrCode.getRunningTrackCameraCapabilities();
                         if (caps && caps.torchFeature && caps.torchFeature().isSupported()) {
@@ -2725,7 +2860,6 @@
             }
             els.btnCameraClose.addEventListener('click', stopCamera);
 
-            // Büyük Görsel Modalı
             els.pImg.addEventListener('click', () => {
                 document.getElementById('modalImgSrc').src = els.pImg.src;
                 openModal(els.imgModal);
