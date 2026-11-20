@@ -265,6 +265,9 @@
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         input, textarea, select { -webkit-user-select: auto; -ms-user-select: auto; user-select: auto; }
@@ -324,9 +327,8 @@
 
         /* --- MAIN LAYOUT --- */
         .main-container {
-            width: 100%; max-width: 880px; margin: 0 auto;
-            padding: 8px 8px 28px;
-            min-height: calc(100vh - 140px);
+            width: 100%; max-width: 880px; margin: 0 auto; flex: 1;
+            padding: 8px 8px 24px; display: flex; flex-direction: column;
         }
         @media (min-width: 640px) {
             .top-app-bar { padding: 0 14px 0 18px; height: 62px; }
@@ -405,6 +407,40 @@
             border-color: transparent;
         }
         .chip.cat-chip { background-color: var(--md-sys-color-surface); }
+
+        /* --- EMPTY HOME STATE (MD3 İPUCU & KARŞILAMA) --- */
+        .empty-home-state {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 34px 18px; margin: 8px 0;
+            background-color: var(--md-sys-color-surface-container-low);
+            border: 1px dashed var(--md-sys-color-outline-variant);
+            border-radius: var(--border-radius-large); gap: 12px; flex: 1;
+        }
+        .empty-home-state.show { display: flex; }
+        .empty-icon-circle {
+            width: 72px; height: 72px; border-radius: 24px;
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 4px;
+        }
+        .empty-icon-circle .material-symbols-rounded { font-size: 38px; }
+        .empty-home-title { font-size: 18px; font-weight: 600; color: var(--md-sys-color-on-surface); }
+        .empty-home-desc {
+            font-size: 13px; color: var(--md-sys-color-on-surface-variant);
+            max-width: 440px; line-height: 1.55;
+        }
+        .empty-tips-row {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px;
+        }
+        .empty-tip-pill {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500;
+            padding: 8px 14px; border-radius: 99px; border: 1px solid var(--md-sys-color-outline-variant);
+            background-color: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface);
+            cursor: pointer; transition: var(--transition-standard);
+        }
+        .empty-tip-pill:hover { background-color: var(--md-sys-color-secondary-container); border-color: transparent; }
+        .empty-tip-pill .material-symbols-rounded { font-size: 17px; color: var(--md-sys-color-primary); }
 
         /* --- SKELETON LOADER --- */
         .skeleton-wrapper { display: none; flex-direction: column; gap: 14px; animation: pulse 1.5s infinite ease-in-out; width: 100%; }
@@ -536,6 +572,14 @@
         }
         .product-action-pill .material-symbols-rounded { font-size: 15px; }
         .product-action-pill.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: transparent; }
+
+        .off-match-note {
+            display: none; align-items: center; gap: 6px; font-size: 11px;
+            color: var(--md-sys-color-on-secondary-container); background: var(--md-sys-color-secondary-container);
+            padding: 6px 10px; border-radius: 8px; margin-bottom: 12px;
+        }
+        .off-match-note.visible { display: flex; }
+        .off-match-note .material-symbols-rounded { font-size: 15px; flex-shrink: 0; }
 
         /* --- PERSONAL DIET ALERT BANNER --- */
         .diet-alert-banner {
@@ -744,7 +788,6 @@
         .modal-overlay.active .settings-dialog { transform: scale(1); }
         .dialog-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); margin-bottom: 12px; }
         
-        /* Adres Arama Modalı İçi */
         .addr-box {
             background: var(--md-sys-color-surface-container); border: 1px solid var(--md-sys-color-outline-variant);
             border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px;
@@ -765,7 +808,6 @@
         .addr-result-item:hover { border-color: var(--md-sys-color-primary); background: var(--md-sys-color-secondary-container); }
         .addr-result-item .material-symbols-rounded { font-size: 16px; color: var(--md-sys-color-primary); margin-top: 1px; flex-shrink: 0; }
 
-        /* Cart & Multi-Tab Modal */
         .cart-dialog { max-width: 600px; height: 88vh; padding: 16px; overflow: hidden; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .m3-tabs {
@@ -953,6 +995,27 @@
             <div class="chips-row" id="historyChips"></div>
         </section>
 
+        <!-- Ana Sayfa Boş Durum & İpucu Kartı -->
+        <section class="empty-home-state show" id="emptyHomeState">
+            <div class="empty-icon-circle">
+                <span class="material-symbols-rounded">manage_search</span>
+            </div>
+            <h2 class="empty-home-title">Ürün Aratın veya Barkod Okutun</h2>
+            <p class="empty-home-desc">
+                Market fiyatlarını karşılaştırmak, içindekiler ve besin değerlerini incelemek ve boykot durumunu görmek için yukarıdaki arama kutusuna ürün adı yazabilir veya barkod tarayıcıyı kullanabilirsiniz.
+            </p>
+            <div class="empty-tips-row">
+                <button class="empty-tip-pill" id="btnEmptyScan">
+                    <span class="material-symbols-rounded">barcode_scanner</span>
+                    <span>Kamera ile Barkod Okut</span>
+                </button>
+                <button class="empty-tip-pill" id="btnEmptyLocation">
+                    <span class="material-symbols-rounded">my_location</span>
+                    <span>Konuma Göre Yakın Marketleri Bul</span>
+                </button>
+            </div>
+        </section>
+
         <!-- Yükleniyor İskeleti -->
         <div class="skeleton-wrapper" id="loader">
             <div class="skeleton-box sk-header">
@@ -1008,6 +1071,12 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- İsimden OpenFoodFacts Eşleştirme Notu -->
+            <div class="off-match-note" id="offMatchNote">
+                <span class="material-symbols-rounded">auto_awesome</span>
+                <span id="offMatchNoteText"></span>
             </div>
 
             <!-- Kişisel Diyet / Hassasiyet Uyarı Kartı -->
@@ -1100,7 +1169,7 @@
 
             <label style="font-size:12px; font-weight:600; color:var(--md-sys-color-on-surface-variant); margin-bottom:4px;">Adres ile Ara (Mahalle, Sokak, İlçe, İl):</label>
             <div class="addr-search-row">
-                <input type="text" class="addr-input" id="addressSearchInput" placeholder="Örn: Mithat Toroğlu Mh. Toroslar Mersin">
+                <input type="text" class="addr-input" id="addressSearchInput" placeholder="Örn: Kızılay Mh. Çankaya Ankara">
                 <button class="btn-primary" id="btnSearchAddress" style="padding: 8px 14px;">Bul</button>
             </div>
             <div class="addr-results-list" id="addressSearchResults" style="display:none;"></div>
@@ -1303,6 +1372,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const MARKET_API_URL = "https://api.marketfiyati.org.tr/api/v2";
             const OFF_PRICES_API = "https://prices.openfoodfacts.org/api/v1/prices";
+            const OFF_FIELDS = "code,product_name_tr,product_name,brands,quantity,serving_size,image_url,image_front_url,nutriscore_grade,ecoscore_grade,nova_group,nutriments,nutrient_levels,ingredients_text_with_allergens_tr,ingredients_text_tr,ingredients_text,ingredients_analysis_tags,allergens_hierarchy,traces_hierarchy,additives_tags,labels_tags,categories_hierarchy,countries_tags";
             const DEFAULT_IMG_URL = "https://r.resimlink.com/RQpPf4d2.png";
             const MARKET_LOGOS = {
                 "bim": "https://raw.githubusercontent.com/Berathd7777/NutriTurk/refs/heads/main/bim-home.svg",
@@ -1343,6 +1413,7 @@
                 searchInput: document.getElementById('searchInput'),
                 btnClearInput: document.getElementById('btnClearInput'),
                 btnScan: document.getElementById('btnScan'),
+                emptyHomeState: document.getElementById('emptyHomeState'),
                 loader: document.getElementById('loader'),
                 searchResultsSection: document.getElementById('searchResultsSection'),
                 resultsGrid: document.getElementById('resultsGrid'),
@@ -1452,13 +1523,14 @@
                 } catch { return ''; }
             }
 
-            function playBeep(success = true) {
+            // Bip sesi SADECE kamera ile barkod okutulduğunda çalar
+            function playScanBeep() {
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
                     const osc = audioCtx.createOscillator();
-                    osc.type = success ? 'sine' : 'square';
-                    osc.frequency.setValueAtTime(success ? 880 : 300, audioCtx.currentTime);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(920, audioCtx.currentTime);
                     osc.connect(audioCtx.destination);
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.08);
@@ -1476,16 +1548,13 @@
                 return str.trim() || '0 Lira';
             }
 
-            // Başlıkta aynı marka ismi varsa seslendirmede tekrar etmemek için temizleyici
             function buildSpeechProductTitle(brand, name) {
                 const cleanName = (name || '').trim();
                 const primaryBrand = (brand || '').split(',')[0].trim();
                 if (!primaryBrand) return cleanName;
                 const normName = normalizeTr(cleanName);
                 const normBrand = normalizeTr(primaryBrand);
-                if (normBrand && normName.includes(normBrand)) {
-                    return cleanName;
-                }
+                if (normBrand && normName.includes(normBrand)) return cleanName;
                 return `${primaryBrand} ${cleanName}`.trim();
             }
 
@@ -1509,11 +1578,13 @@
 
             function setUiState(state) {
                 els.loader.style.display = 'none';
+                els.emptyHomeState.classList.remove('show');
                 els.searchResultsSection.classList.remove('show');
                 els.resultContainer.classList.remove('show');
                 if (state === 'loading') els.loader.style.display = 'flex';
                 else if (state === 'list') els.searchResultsSection.classList.add('show');
                 else if (state === 'result') els.resultContainer.classList.add('show');
+                else if (state === 'none') els.emptyHomeState.classList.add('show');
             }
 
             function openModal(modalEl) {
@@ -1558,6 +1629,10 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
+            // Ana sayfa boş durum hızlı butonları
+            document.getElementById('btnEmptyScan').addEventListener('click', () => els.btnScan.click());
+            document.getElementById('btnEmptyLocation').addEventListener('click', () => openModal(els.locationModal));
+
             // --- TAM ADRES & KONUM YÖNETİMİ ---
             function formatNominatimAddress(addrObj, displayName) {
                 if (!addrObj) return { shortLabel: displayName || 'Konumum', fullAddress: displayName || 'Konumum' };
@@ -1579,10 +1654,7 @@
             }
 
             async function refreshNearestDepots(lat, lng, distance) {
-                if (lat === null || lng === null) {
-                    userLocation.depots = [];
-                    return;
-                }
+                if (lat === null || lng === null) { userLocation.depots = []; return; }
                 const endpoints = [
                     { url: `${MARKET_API_URL}/nearest`, opt: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ latitude: lat, longitude: lng, distance }) } },
                     { url: `${MARKET_API_URL}/nearest?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lng)}&distance=${encodeURIComponent(distance)}`, opt: { method: 'GET' } }
@@ -1632,7 +1704,6 @@
                 localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
                 if (currentProductContext && els.resultContainer.classList.contains('show')) {
                     showAllFarDepots = false;
-                    // Konum değiştiğinde aktif ürünü yeni konumla tekrar çek
                     if (currentProductContext.barcode && /^\d{8,13}$/.test(currentProductContext.barcode)) {
                         openBarcodeProduct(currentProductContext.barcode);
                     } else {
@@ -1695,7 +1766,6 @@
                 );
             });
 
-            // Adres arama (Mithat Toroğlu Mh. 88008. Sk. Toroslar Mersin Türkiye gibi)
             async function searchAddressText() {
                 const q = els.addressSearchInput.value.trim();
                 if (!q) return;
@@ -1816,7 +1886,7 @@
                 }
             });
 
-            // --- BOYKOT KONTROLÜ (Türkçe karakter + '-' ayrılmış çoklu kelimeli markalar) ---
+            // --- BOYKOT KONTROLÜ ---
             function normalizeTr(text) {
                 if (!text) return '';
                 return String(text)
@@ -1963,7 +2033,7 @@
                 if (e.key === 'Enter') startSearch(els.searchInput.value);
             });
 
-            // --- MARKET FİYATI API İSTEKLERİ ---
+            // --- MARKET FİYATI & OPEN FOOD FACTS API ---
             async function postMarketApi(endpoint, payload) {
                 const res = await fetch(`${MARKET_API_URL}/${endpoint}`, {
                     method: "POST",
@@ -2004,26 +2074,104 @@
                 return await postMarketApi('searchByIdentity', base);
             }
 
-            async function fetchOpenFoodFacts(barcode) {
-                if (!barcode) return { offData: null, offUserPriceData: null };
-                let offData = null, offUserPriceData = null;
-                try {
-                    const fields = "product_name_tr,product_name,brands,quantity,serving_size,image_url,image_front_url,nutriscore_grade,ecoscore_grade,nova_group,nutriments,nutrient_levels,ingredients_text_with_allergens_tr,ingredients_text_tr,ingredients_text,ingredients_analysis_tags,allergens_hierarchy,traces_hierarchy,additives_tags,labels_tags,categories_hierarchy";
-                    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=${fields}`);
-                    const d = await r.json();
-                    if (d.status === 1) offData = d.product;
-                } catch {}
+            // İsimden temizlenmiş arama sorgusu üret (gramaj/hacim birimlerini çıkar)
+            function cleanProductQueryForOff(title, brand) {
+                let t = (title || '')
+                    .replace(/\b\d+\s*(x\s*\d+\s*)?(gr?|kg|ml|lt?|l|cl|adet|li|lı|lu|lü)\b/gi, ' ')
+                    .replace(/[^\wçğıöşüÇĞİÖŞÜ\s]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                const primaryBrand = (brand || '').split(',')[0].trim();
+                if (primaryBrand && !normalizeTr(t).includes(normalizeTr(primaryBrand))) {
+                    t = `${primaryBrand} ${t}`.trim();
+                }
+                return t;
+            }
 
-                if (isUserPriceEnabled) {
+            // Open Food Facts'te barkodla bulamazsa ürün adıyla en uygun eşleşmeyi ara
+            async function fetchOpenFoodFactsByName(title, brand) {
+                const cleanedQuery = cleanProductQueryForOff(title, brand);
+                if (!cleanedQuery || cleanedQuery.length < 3) return null;
+
+                const targetTokens = normalizeTr(cleanedQuery).split(' ').filter(w => w.length >= 2);
+                if (targetTokens.length === 0) return null;
+
+                try {
+                    const ctrl = new AbortController();
+                    const timer = setTimeout(() => ctrl.abort(), 5500);
+                    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanedQuery)}&search_simple=1&action=process&json=1&page_size=8&fields=${encodeURIComponent(OFF_FIELDS)}`;
+                    const res = await fetch(url, { signal: ctrl.signal });
+                    clearTimeout(timer);
+                    if (!res.ok) return null;
+                    const data = await res.json();
+                    const candidates = data?.products || [];
+                    if (candidates.length === 0) return null;
+
+                    let best = null;
+                    let bestScore = 0;
+
+                    for (const p of candidates) {
+                        const pText = normalizeTr(`${p.brands || ''} ${p.product_name_tr || p.product_name || ''}`);
+                        if (!pText) continue;
+                        const pTokens = new Set(pText.split(' ').filter(w => w.length >= 2));
+
+                        let matchCount = 0;
+                        targetTokens.forEach(tok => {
+                            if (pTokens.has(tok) || pText.includes(tok)) matchCount++;
+                        });
+
+                        const ratio = matchCount / targetTokens.length;
+                        if (matchCount < 2 && ratio < 0.6) continue;
+
+                        let score = ratio * 10 + matchCount * 2;
+                        if (p.ingredients_text_with_allergens_tr || p.ingredients_text_tr || p.ingredients_text) score += 4;
+                        if (p.nutriments && Object.keys(p.nutriments).length > 0) score += 2;
+                        if (p.nutriscore_grade) score += 1;
+                        if (Array.isArray(p.countries_tags) && p.countries_tags.includes('en:turkey')) score += 3;
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            best = p;
+                        }
+                    }
+                    return best;
+                } catch {
+                    return null;
+                }
+            }
+
+            async function fetchOpenFoodFacts(barcode, fallbackTitle = '', fallbackBrand = '') {
+                let offData = null, offUserPriceData = null, matchedByName = false;
+
+                if (barcode) {
                     try {
-                        const pRes = await fetch(`${OFF_PRICES_API}?product_code=${barcode}&size=1&order_by=-date`);
+                        const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=${encodeURIComponent(OFF_FIELDS)}`);
+                        const d = await r.json();
+                        if (d.status === 1 && d.product) offData = d.product;
+                    } catch {}
+                }
+
+                // Barkodda bulunamadıysa veya içindekiler/besin bilgisi yoksa isimle Open Food Facts'te ara
+                const hasUsefulOffInfo = offData && (offData.ingredients_text_with_allergens_tr || offData.ingredients_text_tr || offData.ingredients_text || offData.nutriscore_grade || (offData.nutriments && Object.keys(offData.nutriments).length > 2));
+                if (!hasUsefulOffInfo && fallbackTitle) {
+                    const nameMatch = await fetchOpenFoodFactsByName(fallbackTitle, fallbackBrand);
+                    if (nameMatch) {
+                        offData = nameMatch;
+                        matchedByName = true;
+                    }
+                }
+
+                const priceBarcode = barcode || offData?.code;
+                if (isUserPriceEnabled && priceBarcode) {
+                    try {
+                        const pRes = await fetch(`${OFF_PRICES_API}?product_code=${priceBarcode}&size=1&order_by=-date`);
                         if (pRes.ok) {
                             const pJson = await pRes.json();
                             if (pJson.items && pJson.items.length > 0) offUserPriceData = pJson.items[0];
                         }
                     } catch {}
                 }
-                return { offData, offUserPriceData };
+                return { offData, offUserPriceData, matchedByName };
             }
 
             async function startSearch(query) {
@@ -2039,7 +2187,6 @@
                     else await performKeywordSearch(val);
                 } catch (err) {
                     console.error(err);
-                    playBeep(false);
                     showSnackbar('Arama sırasında bağlantı hatası oluştu.', 'error');
                     setUiState('none');
                 }
@@ -2058,10 +2205,13 @@
                     if (json.content && json.content.length > 0) marketData = json.content[0];
                 } catch {}
 
-                const { offData, offUserPriceData } = await fetchOpenFoodFacts(barcode);
+                const { offData, offUserPriceData, matchedByName } = await fetchOpenFoodFacts(
+                    barcode,
+                    marketData?.title || '',
+                    marketData?.brand || ''
+                );
 
                 if (!marketData && !offData) {
-                    playBeep(false);
                     showSnackbar('Bu barkodla eşleşen ürün bulunamadı.', 'error');
                     speak('Ürün bulunamadı');
                     setUiState('none');
@@ -2070,7 +2220,7 @@
 
                 els.btnBackToResults.classList.remove('visible');
                 showAllFarDepots = false;
-                await renderProduct(marketData, offData, offUserPriceData, barcode);
+                await renderProduct(marketData, offData, offUserPriceData, barcode, matchedByName);
             }
 
             async function performKeywordSearch(keywords) {
@@ -2088,7 +2238,14 @@
                 } catch {}
 
                 if (!json || !json.content || json.content.length === 0) {
-                    playBeep(false);
+                    // Market Fiyatı'nda bulunamazsa yine de Open Food Facts'te isimle ara
+                    const offMatch = await fetchOpenFoodFactsByName(keywords, '');
+                    if (offMatch) {
+                        els.btnBackToResults.classList.remove('visible');
+                        showAllFarDepots = false;
+                        await renderProduct(null, offMatch, null, offMatch.code || null, true);
+                        return;
+                    }
                     showSnackbar('Aramanızla eşleşen ürün bulunamadı.', 'error');
                     speak('Ürün bulunamadı');
                     setUiState('none');
@@ -2109,7 +2266,6 @@
 
                 renderSearchResultsGrid(json.numberOfFound || currentSearchResults.length);
                 setUiState('list');
-                playBeep(true);
             }
 
             function getEffectiveDepotsForCard(depots) {
@@ -2250,16 +2406,20 @@
                 }
 
                 const barcode = fullMarketData.barcode || item.barcode || null;
-                const { offData, offUserPriceData } = await fetchOpenFoodFacts(barcode);
+                const { offData, offUserPriceData, matchedByName } = await fetchOpenFoodFacts(
+                    barcode,
+                    fullMarketData.title || item.title || '',
+                    fullMarketData.brand || item.brand || ''
+                );
 
                 els.btnBackToResults.classList.toggle('visible', fromResultsList && currentSearchResults.length > 1);
-                await renderProduct(fullMarketData, offData, offUserPriceData, barcode);
+                await renderProduct(fullMarketData, offData, offUserPriceData, barcode, matchedByName);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             // --- ÜRÜN DETAY RENDER ---
-            async function renderProduct(m, o, offPrice, explicitBarcode) {
-                const name = o?.product_name_tr || o?.product_name || m?.title || 'Bilinmeyen Ürün';
+            async function renderProduct(m, o, offPrice, explicitBarcode, matchedByName = false) {
+                const name = m?.title || o?.product_name_tr || o?.product_name || 'Bilinmeyen Ürün';
                 const brand = o?.brands || m?.brand || '';
                 const quantity = o?.quantity || m?.refinedVolumeOrWeight || '';
                 const barcode = explicitBarcode || m?.barcode || o?.code || name;
@@ -2270,9 +2430,18 @@
                 qEl.textContent = quantity;
                 qEl.style.display = quantity ? 'inline-block' : 'none';
 
+                const offMatchNote = document.getElementById('offMatchNote');
+                if (matchedByName && o) {
+                    const matchedTitle = o.product_name_tr || o.product_name || name;
+                    document.getElementById('offMatchNoteText').textContent = `İçindekiler ve besin değerleri Open Food Facts üzerinden "${matchedTitle}" ürünüyle eşleştirildi.`;
+                    offMatchNote.classList.add('visible');
+                } else {
+                    offMatchNote.classList.remove('visible');
+                }
+
                 const boycottStatus = checkBoycott(brand, name);
 
-                let imgUrl = o?.image_url || o?.image_front_url || m?.imageUrl;
+                let imgUrl = m?.imageUrl || o?.image_url || o?.image_front_url;
                 const finalImgUrl = (await checkImage(imgUrl)) ? imgUrl : DEFAULT_IMG_URL;
                 els.pImg.src = finalImgUrl;
 
@@ -2297,7 +2466,6 @@
                 renderNutritionSection(o);
                 renderDetailsAccordion(o, m);
 
-                playBeep(true);
                 setUiState('result');
 
                 loadSimilarProducts(name, m?.id);
@@ -2555,8 +2723,10 @@
                 badgesDiv.innerHTML = '';
                 if (!o) return;
 
-                if (o.nutriscore_grade) scoresDiv.innerHTML += `<div class="score-item"><span>Nutri-Score</span><img src="https://static.openfoodfacts.org/images/attributes/dist/nutriscore-${o.nutriscore_grade}-new-en.svg" alt="Nutri-Score"></div>`;
-                if (o.ecoscore_grade) {
+                if (o.nutriscore_grade && o.nutriscore_grade !== 'unknown' && o.nutriscore_grade !== 'not-applicable') {
+                    scoresDiv.innerHTML += `<div class="score-item"><span>Nutri-Score</span><img src="https://static.openfoodfacts.org/images/attributes/dist/nutriscore-${o.nutriscore_grade}-new-en.svg" alt="Nutri-Score"></div>`;
+                }
+                if (o.ecoscore_grade && o.ecoscore_grade !== 'unknown') {
                     const ecoImg = o.ecoscore_grade === 'not-applicable' ? 'green-score-not-applicable.svg' : `green-score-${o.ecoscore_grade}.svg`;
                     scoresDiv.innerHTML += `<div class="score-item"><span>Eco-Score</span><img src="https://static.openfoodfacts.org/images/attributes/dist/${ecoImg}" alt="Eco-Score"></div>`;
                 }
@@ -2824,7 +2994,6 @@
                 }
                 saveCart();
                 showSnackbar('Ürün sepete eklendi!', 'info');
-                playBeep(true);
             }
 
             function updateCartQtyLogic(id, delta) {
@@ -3004,6 +3173,7 @@
                     { facingMode: "environment" },
                     { fps: 12, qrbox: { width: 250, height: 250 } },
                     (text) => {
+                        playScanBeep();
                         stopCamera();
                         els.searchInput.value = text;
                         els.btnClearInput.classList.add('visible');
