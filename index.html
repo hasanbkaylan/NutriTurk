@@ -67,9 +67,7 @@
                     const req = indexedDB.open(DB_NAME, 1);
                     req.onupgradeneeded = (e) => {
                         const db = e.target.result;
-                        if (!db.objectStoreNames.contains(STORE_NAME)) {
-                            db.createObjectStore(STORE_NAME);
-                        }
+                        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
                     };
                     req.onsuccess = (e) => resolve(e.target.result);
                     req.onerror = (e) => reject(e.target.error);
@@ -256,11 +254,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
         
         body {
             font-family: 'Roboto', sans-serif;
@@ -328,7 +322,7 @@
         }
         .nav-badge.fav { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
 
-        /* --- MAIN LAYOUT (Daha Az Kenar Boşluğu, Geniş Alan) --- */
+        /* --- MAIN LAYOUT --- */
         .main-container {
             width: 100%; max-width: 880px; margin: 0 auto;
             padding: 8px 8px 28px;
@@ -358,7 +352,7 @@
             background-color: var(--md-sys-color-surface-container-high);
             color: var(--md-sys-color-on-surface); border: none; border-radius: 99px;
             padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer;
-            transition: var(--transition-standard);
+            transition: var(--transition-standard); text-align: left;
         }
         .location-pill span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .location-pill.active {
@@ -454,27 +448,17 @@
             background-color: var(--md-sys-color-surface-container-high);
             border-color: var(--md-sys-color-primary);
         }
-        .product-grid-card.pg-boycott {
-            background-color: #FFF0EE; border-color: rgba(186, 26, 26, 0.35);
-        }
-        [data-theme="dark"] .product-grid-card.pg-boycott {
-            background-color: #381414; border-color: rgba(255, 180, 171, 0.3);
-        }
-        .product-grid-card.pg-safe {
-            background-color: #EFFBF4; border-color: rgba(0, 108, 81, 0.3);
-        }
-        [data-theme="dark"] .product-grid-card.pg-safe {
-            background-color: #0E2B1E; border-color: rgba(95, 219, 180, 0.25);
-        }
+        .product-grid-card.pg-boycott { background-color: #FFF0EE; border-color: rgba(186, 26, 26, 0.35); }
+        [data-theme="dark"] .product-grid-card.pg-boycott { background-color: #381414; border-color: rgba(255, 180, 171, 0.3); }
+        .product-grid-card.pg-safe { background-color: #EFFBF4; border-color: rgba(0, 108, 81, 0.3); }
+        [data-theme="dark"] .product-grid-card.pg-safe { background-color: #0E2B1E; border-color: rgba(95, 219, 180, 0.25); }
 
-        /* Kart Sağ Üst Boykot Köşe Rozeti */
         .pg-corner-badge {
             position: absolute; top: 0; right: 0;
             padding: 3px 9px 4px 10px;
             border-radius: 0 var(--border-radius-medium) 0 10px;
             font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
-            display: inline-flex; align-items: center; gap: 4px;
-            z-index: 2;
+            display: inline-flex; align-items: center; gap: 4px; z-index: 2;
         }
         .pg-corner-badge .material-symbols-rounded { font-size: 13px; }
         .pg-corner-badge.boycott { background-color: #BA1A1A; color: #FFFFFF; }
@@ -482,35 +466,19 @@
 
         .pg-top { display: flex; gap: 10px; align-items: center; min-width: 0; }
         .product-grid-card.has-badge .pg-top { margin-top: 14px; }
-        .pg-img {
-            width: 64px; height: 64px; object-fit: contain; border-radius: 10px;
-            background: #fff; padding: 4px; flex-shrink: 0;
-        }
+        .pg-img { width: 64px; height: 64px; object-fit: contain; border-radius: 10px; background: #fff; padding: 4px; flex-shrink: 0; }
         .pg-meta { flex: 1; min-width: 0; }
         .pg-brand { font-size: 11px; font-weight: 700; color: var(--md-sys-color-primary); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .pg-title {
-            font-size: 14px; font-weight: 500; color: var(--md-sys-color-on-surface);
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;
-        }
+        .pg-title { font-size: 14px; font-weight: 500; color: var(--md-sys-color-on-surface); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
         .pg-weight { font-size: 11px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
-        .pg-bottom {
-            display: flex; justify-content: space-between; align-items: flex-end; gap: 8px;
-            border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 8px; margin-top: auto;
-        }
+        .pg-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 8px; margin-top: auto; }
         .pg-price-col { display: flex; flex-direction: column; flex-shrink: 0; }
         .pg-min-label { font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
         .pg-price { font-size: 17px; font-weight: 700; color: var(--md-sys-color-primary); }
         .pg-unit { font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
 
-        /* Kart İçi Küçük Market Logoları */
-        .pg-market-logos {
-            display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 5px; min-width: 0;
-        }
-        .pg-mk-pill {
-            background: #fff; border-radius: 6px; padding: 2px 5px;
-            display: inline-flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-        }
+        .pg-market-logos { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 5px; min-width: 0; }
+        .pg-mk-pill { background: #fff; border-radius: 6px; padding: 2px 5px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
         .pg-mk-logo { height: 13px; max-width: 44px; object-fit: contain; display: block; }
         .pg-mk-txt { font-size: 10px; font-weight: 700; color: #222; }
 
@@ -713,9 +681,7 @@
         }
         .traffic-lights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
         @media (min-width: 500px) { .traffic-lights { grid-template-columns: repeat(4, 1fr); } }
-        .tl-item {
-            padding: 9px 6px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
-        }
+        .tl-item { padding: 9px 6px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
         .tl-item.low { background: #D6F5E3; color: #004E36; }
         .tl-item.moderate { background: #FFDCBC; color: #5E3400; }
         .tl-item.high { background: #FFDAD6; color: #7C0006; }
@@ -770,14 +736,36 @@
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .settings-dialog {
-            background-color: var(--md-sys-color-surface-container-high); width: 100%; max-width: 440px;
+            background-color: var(--md-sys-color-surface-container-high); width: 100%; max-width: 460px;
             max-height: 90vh; display: flex; flex-direction: column;
             border-radius: var(--border-radius-large); padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
             transform: scale(0.94); transition: 0.25s cubic-bezier(0.2, 0, 0, 1); overflow-y: auto;
         }
         .modal-overlay.active .settings-dialog { transform: scale(1); }
-        .dialog-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); margin-bottom: 14px; }
+        .dialog-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); margin-bottom: 12px; }
         
+        /* Adres Arama Modalı İçi */
+        .addr-box {
+            background: var(--md-sys-color-surface-container); border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px;
+        }
+        .addr-search-row { display: flex; gap: 6px; margin-bottom: 8px; }
+        .addr-input {
+            flex: 1; min-width: 0; border: 1px solid var(--md-sys-color-outline); border-radius: 10px;
+            padding: 9px 12px; font-size: 13px; background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface); font-family: inherit; outline: none;
+        }
+        .addr-input:focus { border-color: var(--md-sys-color-primary); }
+        .addr-results-list { display: flex; flex-direction: column; gap: 6px; max-height: 170px; overflow-y: auto; margin-bottom: 10px; }
+        .addr-result-item {
+            background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 10px; padding: 8px 10px; font-size: 12px; text-align: left; cursor: pointer;
+            color: var(--md-sys-color-on-surface); display: flex; align-items: flex-start; gap: 6px;
+        }
+        .addr-result-item:hover { border-color: var(--md-sys-color-primary); background: var(--md-sys-color-secondary-container); }
+        .addr-result-item .material-symbols-rounded { font-size: 16px; color: var(--md-sys-color-primary); margin-top: 1px; flex-shrink: 0; }
+
+        /* Cart & Multi-Tab Modal */
         .cart-dialog { max-width: 600px; height: 88vh; padding: 16px; overflow: hidden; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .m3-tabs {
@@ -1097,40 +1085,49 @@
         </div>
     </footer>
 
-    <!-- Konum & Mesafe Modalı -->
+    <!-- Konum & Tam Adres Modalı -->
     <div class="modal-overlay" id="locationModal">
         <div class="settings-dialog">
-            <h3 class="dialog-title">Konum & Arama Yarıçapı</h3>
-            <p style="font-size:13px; color:var(--md-sys-color-on-surface-variant); margin-bottom:14px;">
-                Konumunuzu seçtiğinizde yalnızca seçtiğiniz yarıçap içindeki yakın market şubeleri öncelikli olarak filtrelenir.
-            </p>
-            <button class="btn-primary" id="btnUseGps" style="width:100%; justify-content:center; margin-bottom:14px;">
+            <h3 class="dialog-title">Konum & Tam Adres</h3>
+            <div class="addr-box" id="currentFullAddressBox">
+                <strong>Seçili Konum:</strong> <span id="currentFullAddressText">Tüm Türkiye (Konum seçilmedi)</span>
+            </div>
+
+            <button class="btn-primary" id="btnUseGps" style="width:100%; justify-content:center; margin-bottom:12px;">
                 <span class="material-symbols-rounded" style="font-size:20px;">my_location</span>
-                <span>Mevcut Konumumu Kullan (GPS)</span>
+                <span>Mevcut Konumumu Tam Adresle Al (GPS)</span>
             </button>
+
+            <label style="font-size:12px; font-weight:600; color:var(--md-sys-color-on-surface-variant); margin-bottom:4px;">Adres ile Ara (Mahalle, Sokak, İlçe, İl):</label>
+            <div class="addr-search-row">
+                <input type="text" class="addr-input" id="addressSearchInput" placeholder="Örn: Mithat Toroğlu Mh. Toroslar Mersin">
+                <button class="btn-primary" id="btnSearchAddress" style="padding: 8px 14px;">Bul</button>
+            </div>
+            <div class="addr-results-list" id="addressSearchResults" style="display:none;"></div>
+
             <div class="setting-item">
                 <div class="setting-text">
                     <span class="setting-title">Hızlı Şehir Seçimi</span>
-                    <span class="setting-desc">GPS izni vermeden il merkezi seçin</span>
+                    <span class="setting-desc">Adres yazmadan il merkezi seçin</span>
                 </div>
                 <select class="m3-select" id="cityPresetSelect">
-                    <option value="">Tüm Türkiye (Konumsuz)</option>
-                    <option value="41.0082,28.9784,İstanbul">İstanbul</option>
-                    <option value="39.9334,32.8597,Ankara">Ankara</option>
-                    <option value="38.4237,27.1428,İzmir">İzmir</option>
-                    <option value="40.1885,29.0610,Bursa">Bursa</option>
-                    <option value="36.8969,30.7133,Antalya">Antalya</option>
-                    <option value="37.0000,35.3213,Adana">Adana</option>
-                    <option value="41.2867,36.3300,Samsun">Samsun</option>
-                    <option value="37.8714,32.4846,Konya">Konya</option>
-                    <option value="37.0662,37.3833,Gaziantep">Gaziantep</option>
-                    <option value="41.0015,39.7178,Trabzon">Trabzon</option>
+                    <option value="">Seçiniz...</option>
+                    <option value="41.0082,28.9784,İstanbul Türkiye">İstanbul</option>
+                    <option value="39.9334,32.8597,Ankara Türkiye">Ankara</option>
+                    <option value="38.4237,27.1428,İzmir Türkiye">İzmir</option>
+                    <option value="36.8121,34.6415,Mersin Türkiye">Mersin</option>
+                    <option value="40.1885,29.0610,Bursa Türkiye">Bursa</option>
+                    <option value="36.8969,30.7133,Antalya Türkiye">Antalya</option>
+                    <option value="37.0000,35.3213,Adana Türkiye">Adana</option>
+                    <option value="41.2867,36.3300,Samsun Türkiye">Samsun</option>
+                    <option value="37.8714,32.4846,Konya Türkiye">Konya</option>
+                    <option value="37.0662,37.3833,Gaziantep Türkiye">Gaziantep</option>
                 </select>
             </div>
             <div class="setting-item">
                 <div class="setting-text">
                     <span class="setting-title">Arama Mesafesi</span>
-                    <span class="setting-desc">Şubelerin filtreleneceği yarıçap</span>
+                    <span class="setting-desc">Yakınınızdaki market yarıçapı</span>
                 </div>
                 <select class="m3-select" id="distanceSelect">
                     <option value="2">2 km</option>
@@ -1321,12 +1318,12 @@
                 "carrefour": "CarrefourSA", "tarim_kredi": "Tarım Kredi", "hakmar": "Hakmar"
             };
 
-            let boycottList = [];
-            let safeList = [];
+            let boycottMatchers = [];
+            let safeMatchers = [];
             let cart = JSON.parse(localStorage.getItem('nutriturk_cart') || '[]');
             let favorites = JSON.parse(localStorage.getItem('nutriturk_favorites') || '[]');
             let dietPrefs = JSON.parse(localStorage.getItem('nutriturk_diet_prefs') || '[]');
-            let userLocation = JSON.parse(localStorage.getItem('nutriturk_location') || '{"lat":null,"lng":null,"label":"Tüm Türkiye","distance":5}');
+            let userLocation = JSON.parse(localStorage.getItem('nutriturk_location') || '{"lat":null,"lng":null,"label":"Tüm Türkiye","fullAddress":"Tüm Türkiye (Konum seçilmedi)","distance":5,"depots":[]}');
             let searchHistory = JSON.parse(localStorage.getItem('nutriturk_history') || '[]');
 
             let isTtsEnabled = localStorage.getItem('nutriturk_tts') === 'true';
@@ -1375,6 +1372,10 @@
                 locationModal: document.getElementById('locationModal'),
                 btnLocationClose: document.getElementById('btnLocationClose'),
                 btnUseGps: document.getElementById('btnUseGps'),
+                addressSearchInput: document.getElementById('addressSearchInput'),
+                btnSearchAddress: document.getElementById('btnSearchAddress'),
+                addressSearchResults: document.getElementById('addressSearchResults'),
+                currentFullAddressText: document.getElementById('currentFullAddressText'),
                 cityPresetSelect: document.getElementById('cityPresetSelect'),
                 distanceSelect: document.getElementById('distanceSelect'),
                 btnClearLocation: document.getElementById('btnClearLocation'),
@@ -1395,6 +1396,9 @@
             els.toggleTts.checked = isTtsEnabled;
             syncDietChipsUI();
             updateLocationUI();
+            if (userLocation.lat !== null && userLocation.lng !== null && (!userLocation.depots || userLocation.depots.length === 0)) {
+                refreshNearestDepots(userLocation.lat, userLocation.lng, userLocation.distance || 5);
+            }
             renderCartUI();
             updateCartBadge();
             updateFavBadge();
@@ -1414,13 +1418,22 @@
                 return Object.keys(MARKET_LOGOS).find(k => lower.includes(k)) || null;
             }
 
+            function parseValidCoord(val) {
+                if (val === null || val === undefined || val === '') return null;
+                const num = parseFloat(val);
+                if (isNaN(num) || num === 0) return null;
+                return num;
+            }
+
             function calcDistanceKm(lat1, lon1, lat2, lon2) {
-                if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
+                const a1 = parseValidCoord(lat1), o1 = parseValidCoord(lon1);
+                const a2 = parseValidCoord(lat2), o2 = parseValidCoord(lon2);
+                if (a1 === null || o1 === null || a2 === null || o2 === null) return null;
                 const R = 6371;
-                const dLat = (lat2 - lat1) * Math.PI / 180;
-                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const dLat = (a2 - a1) * Math.PI / 180;
+                const dLon = (o2 - o1) * Math.PI / 180;
                 const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.cos(a1 * Math.PI / 180) * Math.cos(a2 * Math.PI / 180) *
                           Math.sin(dLon/2) * Math.sin(dLon/2);
                 return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
@@ -1461,6 +1474,19 @@
                 if(tl > 0) str += `${tl} Lira `;
                 if(kurus > 0) str += `${kurus} Kuruş`;
                 return str.trim() || '0 Lira';
+            }
+
+            // Başlıkta aynı marka ismi varsa seslendirmede tekrar etmemek için temizleyici
+            function buildSpeechProductTitle(brand, name) {
+                const cleanName = (name || '').trim();
+                const primaryBrand = (brand || '').split(',')[0].trim();
+                if (!primaryBrand) return cleanName;
+                const normName = normalizeTr(cleanName);
+                const normBrand = normalizeTr(primaryBrand);
+                if (normBrand && normName.includes(normBrand)) {
+                    return cleanName;
+                }
+                return `${primaryBrand} ${cleanName}`.trim();
             }
 
             function speak(text) {
@@ -1532,27 +1558,86 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // --- KONUM YÖNETİMİ ---
+            // --- TAM ADRES & KONUM YÖNETİMİ ---
+            function formatNominatimAddress(addrObj, displayName) {
+                if (!addrObj) return { shortLabel: displayName || 'Konumum', fullAddress: displayName || 'Konumum' };
+                const parts = [];
+                const mahalle = addrObj.neighbourhood || addrObj.suburb || addrObj.quarter || addrObj.village || '';
+                const sokak = addrObj.road || addrObj.street || addrObj.pedestrian || '';
+                const ilce = addrObj.town || addrObj.district || addrObj.county || addrObj.municipality || '';
+                const il = addrObj.province || addrObj.city || addrObj.state || '';
+                if (mahalle) parts.push(mahalle);
+                if (sokak) parts.push(sokak);
+                if (ilce && !parts.includes(ilce)) parts.push(ilce);
+                if (il && !parts.includes(il)) parts.push(il);
+                if (addrObj.country) parts.push(addrObj.country);
+
+                const fullAddress = parts.length > 0 ? parts.join(' ') : (displayName || 'Konumum');
+                const shortParts = [mahalle || sokak, ilce || il].filter(Boolean);
+                const shortLabel = shortParts.length > 0 ? shortParts.join(', ') : fullAddress;
+                return { shortLabel, fullAddress };
+            }
+
+            async function refreshNearestDepots(lat, lng, distance) {
+                if (lat === null || lng === null) {
+                    userLocation.depots = [];
+                    return;
+                }
+                const endpoints = [
+                    { url: `${MARKET_API_URL}/nearest`, opt: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ latitude: lat, longitude: lng, distance }) } },
+                    { url: `${MARKET_API_URL}/nearest?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lng)}&distance=${encodeURIComponent(distance)}`, opt: { method: 'GET' } }
+                ];
+                for (const ep of endpoints) {
+                    try {
+                        const r = await fetch(ep.url, ep.opt);
+                        if (r.ok) {
+                            const data = await r.json();
+                            const list = Array.isArray(data) ? data : (Array.isArray(data?.content) ? data.content : []);
+                            const ids = list.map(d => d.id || d.depotId).filter(Boolean);
+                            if (ids.length > 0) {
+                                userLocation.depots = ids;
+                                localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
+                                return;
+                            }
+                        }
+                    } catch {}
+                }
+                userLocation.depots = [];
+            }
+
             function updateLocationUI() {
                 const hasCoords = userLocation.lat !== null && userLocation.lng !== null;
                 const pill = els.btnLocationModal;
                 if (hasCoords) {
                     pill.classList.add('active');
                     els.locationPillText.textContent = `${userLocation.label} (${userLocation.distance} km)`;
+                    els.currentFullAddressText.textContent = userLocation.fullAddress || userLocation.label;
                 } else {
                     pill.classList.remove('active');
                     els.locationPillText.textContent = `Konum: Tüm Türkiye`;
+                    els.currentFullAddressText.textContent = 'Tüm Türkiye (Konum seçilmedi)';
                 }
                 els.distanceSelect.value = String(userLocation.distance || 5);
             }
 
-            function saveLocation() {
-                localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
+            async function applyNewLocation(lat, lng, label, fullAddress) {
+                userLocation.lat = lat;
+                userLocation.lng = lng;
+                userLocation.label = label;
+                userLocation.fullAddress = fullAddress || label;
+                userLocation.distance = parseInt(els.distanceSelect.value, 10) || 5;
+                userLocation.depots = [];
                 updateLocationUI();
-                // Eğer halihazırda bir ürün veya liste açıksa mesafe filtresini anında güncelle
+                await refreshNearestDepots(lat, lng, userLocation.distance);
+                localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
                 if (currentProductContext && els.resultContainer.classList.contains('show')) {
                     showAllFarDepots = false;
-                    renderPriceAnalyticsAndDepots(currentProductContext.market);
+                    // Konum değiştiğinde aktif ürünü yeni konumla tekrar çek
+                    if (currentProductContext.barcode && /^\d{8,13}$/.test(currentProductContext.barcode)) {
+                        openBarcodeProduct(currentProductContext.barcode);
+                    } else {
+                        renderPriceAnalyticsAndDepots(currentProductContext.market);
+                    }
                 } else if (currentSearchResults.length > 1 && els.searchResultsSection.classList.contains('show')) {
                     renderSearchResultsGrid(currentSearchResults.length);
                 }
@@ -1562,21 +1647,26 @@
             els.btnLocationClose.addEventListener('click', () => closeModal(els.locationModal));
             els.locationModal.addEventListener('click', (e) => { if (e.target === els.locationModal) closeModal(els.locationModal); });
 
-            async function reverseGeocodeLabel(lat, lng) {
+            async function reverseGeocodeFull(lat, lng) {
                 try {
                     const ctrl = new AbortController();
-                    const timer = setTimeout(() => ctrl.abort(), 3500);
-                    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=tr`, { signal: ctrl.signal });
+                    const timer = setTimeout(() => ctrl.abort(), 5000);
+                    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1&accept-language=tr`, { signal: ctrl.signal });
                     clearTimeout(timer);
                     if (r.ok) {
                         const d = await r.json();
-                        const district = d.locality || d.cityDistrict || '';
-                        const city = d.principalSubdivision || d.city || '';
-                        if (district && city && district !== city) return `${district}, ${city}`;
-                        if (district || city) return district || city;
+                        return formatNominatimAddress(d.address, d.display_name);
                     }
                 } catch {}
-                return 'Konumum';
+                try {
+                    const r2 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=tr`);
+                    if (r2.ok) {
+                        const d2 = await r2.json();
+                        const lbl = [d2.locality || d2.cityDistrict, d2.principalSubdivision || d2.city, 'Türkiye'].filter(Boolean).join(' ');
+                        return { shortLabel: d2.locality || d2.city || 'Konumum', fullAddress: lbl || 'Konumum' };
+                    }
+                } catch {}
+                return { shortLabel: 'Konumum', fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}` };
             }
 
             els.btnUseGps.addEventListener('click', () => {
@@ -1585,52 +1675,87 @@
                     return;
                 }
                 els.btnUseGps.disabled = true;
-                showSnackbar('GPS konumu alınıyor...', 'info');
+                showSnackbar('Tam adresiniz GPS ile alınıyor...', 'info');
                 navigator.geolocation.getCurrentPosition(
                     async (pos) => {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
-                        const label = await reverseGeocodeLabel(lat, lng);
-                        userLocation.lat = lat;
-                        userLocation.lng = lng;
-                        userLocation.label = label;
-                        userLocation.distance = parseInt(els.distanceSelect.value, 10) || 5;
-                        saveLocation();
+                        const addr = await reverseGeocodeFull(lat, lng);
                         els.cityPresetSelect.value = "";
+                        await applyNewLocation(lat, lng, addr.shortLabel, addr.fullAddress);
                         els.btnUseGps.disabled = false;
                         closeModal(els.locationModal);
-                        showSnackbar(`Konum güncellendi: ${label}`, 'info');
+                        showSnackbar(`Konum alındı: ${addr.fullAddress}`, 'info');
                     },
                     () => {
                         els.btnUseGps.disabled = false;
-                        showSnackbar('Konum izni alınamadı. Şehir seçebilirsiniz.', 'error');
+                        showSnackbar('Konum izni alınamadı. Adres kutusuna yazarak arayabilirsiniz.', 'error');
                     },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
                 );
             });
 
-            els.cityPresetSelect.addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (!val) {
-                    userLocation.lat = null; userLocation.lng = null; userLocation.label = 'Tüm Türkiye';
-                } else {
-                    const [lat, lng, label] = val.split(',');
-                    userLocation.lat = parseFloat(lat);
-                    userLocation.lng = parseFloat(lng);
-                    userLocation.label = label;
+            // Adres arama (Mithat Toroğlu Mh. 88008. Sk. Toroslar Mersin Türkiye gibi)
+            async function searchAddressText() {
+                const q = els.addressSearchInput.value.trim();
+                if (!q) return;
+                const listEl = els.addressSearchResults;
+                listEl.style.display = 'flex';
+                listEl.innerHTML = '<div style="font-size:12px; padding:6px;">Adres aranıyor...</div>';
+                try {
+                    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=tr&addressdetails=1&limit=5&accept-language=tr`);
+                    if (!r.ok) throw new Error('Geo error');
+                    const items = await r.json();
+                    listEl.innerHTML = '';
+                    if (!items || items.length === 0) {
+                        listEl.innerHTML = '<div style="font-size:12px; padding:6px; color:var(--md-sys-color-error);">Adres bulunamadı. Mahalle, ilçe, il şeklinde tekrar deneyin.</div>';
+                        return;
+                    }
+                    items.forEach(it => {
+                        const formatted = formatNominatimAddress(it.address, it.display_name);
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'addr-result-item';
+                        btn.innerHTML = `<span class="material-symbols-rounded">place</span><span>${escapeHtml(it.display_name || formatted.fullAddress)}</span>`;
+                        btn.addEventListener('click', async () => {
+                            listEl.style.display = 'none';
+                            els.cityPresetSelect.value = "";
+                            await applyNewLocation(parseFloat(it.lat), parseFloat(it.lon), formatted.shortLabel, formatted.fullAddress);
+                            closeModal(els.locationModal);
+                            showSnackbar(`Adres seçildi: ${formatted.shortLabel}`, 'info');
+                        });
+                        listEl.appendChild(btn);
+                    });
+                } catch {
+                    listEl.innerHTML = '<div style="font-size:12px; padding:6px; color:var(--md-sys-color-error);">Adres servisine ulaşılamadı.</div>';
                 }
-                saveLocation();
+            }
+            els.btnSearchAddress.addEventListener('click', searchAddressText);
+            els.addressSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchAddressText(); });
+
+            els.cityPresetSelect.addEventListener('change', async (e) => {
+                const val = e.target.value;
+                if (!val) return;
+                const [lat, lng, label] = val.split(',');
+                await applyNewLocation(parseFloat(lat), parseFloat(lng), label.replace(' Türkiye', ''), label);
             });
 
-            els.distanceSelect.addEventListener('change', (e) => {
+            els.distanceSelect.addEventListener('change', async (e) => {
                 userLocation.distance = parseInt(e.target.value, 10) || 5;
-                saveLocation();
+                if (userLocation.lat !== null && userLocation.lng !== null) {
+                    await applyNewLocation(userLocation.lat, userLocation.lng, userLocation.label, userLocation.fullAddress);
+                } else {
+                    localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
+                    updateLocationUI();
+                }
             });
 
             els.btnClearLocation.addEventListener('click', () => {
-                userLocation = { lat: null, lng: null, label: 'Tüm Türkiye', distance: 5 };
+                userLocation = { lat: null, lng: null, label: 'Tüm Türkiye', fullAddress: 'Tüm Türkiye (Konum seçilmedi)', distance: 5, depots: [] };
                 els.cityPresetSelect.value = '';
-                saveLocation();
+                els.addressSearchResults.style.display = 'none';
+                localStorage.setItem('nutriturk_location', JSON.stringify(userLocation));
+                updateLocationUI();
                 closeModal(els.locationModal);
                 showSnackbar('Konum sıfırlandı (Tüm Türkiye).', 'info');
             });
@@ -1691,10 +1816,38 @@
                 }
             });
 
-            // --- BOYKOT KONTROLÜ ---
-            function normalizeForSearch(text) {
+            // --- BOYKOT KONTROLÜ (Türkçe karakter + '-' ayrılmış çoklu kelimeli markalar) ---
+            function normalizeTr(text) {
                 if (!text) return '';
-                return text.toLowerCase().replace(/[^a-z0-9çğıöşü]/g, ' ').replace(/\s+/g, ' ').trim();
+                return String(text)
+                    .toLocaleLowerCase('tr-TR')
+                    .replace(/\u0307/g, '')
+                    .replace(/[-_]/g, ' ')
+                    .replace(/[^a-z0-9çğıöşü\s]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            function foldTurkishToAscii(text) {
+                return text
+                    .replace(/ç/g, 'c').replace(/ğ/g, 'g')
+                    .replace(/ı/g, 'i').replace(/ö/g, 'o')
+                    .replace(/ş/g, 's').replace(/ü/g, 'u');
+            }
+
+            function buildBrandMatchers(rawText) {
+                return rawText
+                    .split(/\r?\n/)
+                    .map(line => line.trim())
+                    .filter(line => line && !line.startsWith('#'))
+                    .map(line => {
+                        const spaced = normalizeTr(line);
+                        const ascii = foldTurkishToAscii(spaced);
+                        const compact = spaced.includes(' ') ? spaced.replace(/\s+/g, '') : '';
+                        const compactAscii = ascii.includes(' ') ? ascii.replace(/\s+/g, '') : '';
+                        return { spaced, ascii, compact, compactAscii };
+                    })
+                    .filter(m => m.spaced.length > 0);
             }
 
             async function loadBoycottLists() {
@@ -1704,23 +1857,39 @@
                         fetch('https://raw.githubusercontent.com/Berathd7777/b0ykot/refs/heads/main/b0ykotlist/boykotdegil.txt')
                     ]);
                     if (bRes.ok && sRes.ok) {
-                        boycottList = (await bRes.text()).split('\n').map(normalizeForSearch).filter(Boolean);
-                        safeList = (await sRes.text()).split('\n').map(normalizeForSearch).filter(Boolean);
-                        // Eğer liste yüklendiğinde sonuçlar ekrandaysa rozetleri güncelle
+                        boycottMatchers = buildBrandMatchers(await bRes.text());
+                        safeMatchers = buildBrandMatchers(await sRes.text());
                         if (currentSearchResults.length > 0 && els.searchResultsSection.classList.contains('show')) {
                             renderSearchResultsGrid(currentSearchResults.length);
+                        }
+                        if (currentProductContext && els.resultContainer.classList.contains('show')) {
+                            currentProductContext.boycottStatus = checkBoycott(currentProductContext.brand, currentProductContext.name);
                         }
                     }
                 } catch {}
             }
 
+            function matchesList(matchers, paddedTr, paddedAscii, compactTr, compactAscii) {
+                return matchers.some(m => {
+                    if (paddedTr.includes(` ${m.spaced} `)) return true;
+                    if (m.ascii.length >= 3 && paddedAscii.includes(` ${m.ascii} `)) return true;
+                    if (m.compact && m.compact.length >= 5 && compactTr.includes(m.compact)) return true;
+                    if (m.compactAscii && m.compactAscii.length >= 5 && compactAscii.includes(m.compactAscii)) return true;
+                    return false;
+                });
+            }
+
             function getBoycottStatus(brandName, productName) {
                 if (!isBoycottCheckEnabled) return null;
-                const combined = normalizeForSearch(`${brandName || ''} ${productName || ''}`);
-                if (!combined) return null;
-                const padded = ` ${combined} `;
-                if (boycottList.some(item => padded.includes(` ${item} `))) return 'boycott';
-                if (safeList.some(item => padded.includes(` ${item} `))) return 'safe';
+                const combinedTr = normalizeTr(`${brandName || ''} ${productName || ''}`);
+                if (!combinedTr) return null;
+                const paddedTr = ` ${combinedTr} `;
+                const paddedAscii = ` ${foldTurkishToAscii(combinedTr)} `;
+                const compactTr = combinedTr.replace(/\s+/g, '');
+                const compactAscii = foldTurkishToAscii(compactTr);
+
+                if (matchesList(boycottMatchers, paddedTr, paddedAscii, compactTr, compactAscii)) return 'boycott';
+                if (matchesList(safeMatchers, paddedTr, paddedAscii, compactTr, compactAscii)) return 'safe';
                 return null;
             }
 
@@ -1795,36 +1964,44 @@
             });
 
             // --- MARKET FİYATI API İSTEKLERİ ---
-            async function queryMarketSearch(keywords, size = 24, useLoc = true) {
-                const payload = { keywords, size };
-                if (useLoc && userLocation.lat !== null && userLocation.lng !== null) {
-                    payload.latitude = userLocation.lat;
-                    payload.longitude = userLocation.lng;
-                    payload.distance = userLocation.distance || 5;
-                }
-                const res = await fetch(`${MARKET_API_URL}/search`, {
+            async function postMarketApi(endpoint, payload) {
+                const res = await fetch(`${MARKET_API_URL}/${endpoint}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
-                if (!res.ok) throw new Error('Market API error');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return await res.json();
             }
 
-            async function queryMarketIdentity(identity, identityType = "barcode", useLoc = true) {
-                const payload = { identity, identityType };
+            async function queryMarketSearch(keywords, size = 24, useLoc = true, customDist = null) {
+                const base = { keywords, size };
                 if (useLoc && userLocation.lat !== null && userLocation.lng !== null) {
-                    payload.latitude = userLocation.lat;
-                    payload.longitude = userLocation.lng;
-                    payload.distance = userLocation.distance || 5;
+                    const dist = customDist || userLocation.distance || 5;
+                    if (userLocation.depots && userLocation.depots.length > 0 && !customDist) {
+                        try {
+                            const withDepots = await postMarketApi('search', { ...base, latitude: userLocation.lat, longitude: userLocation.lng, distance: dist, depots: userLocation.depots });
+                            if (withDepots?.content?.length > 0) return withDepots;
+                        } catch {}
+                    }
+                    return await postMarketApi('search', { ...base, latitude: userLocation.lat, longitude: userLocation.lng, distance: dist });
                 }
-                const res = await fetch(`${MARKET_API_URL}/searchByIdentity`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) throw new Error('Market Identity API error');
-                return await res.json();
+                return await postMarketApi('search', base);
+            }
+
+            async function queryMarketIdentity(identity, identityType = "barcode", useLoc = true, customDist = null) {
+                const base = { identity, identityType };
+                if (useLoc && userLocation.lat !== null && userLocation.lng !== null) {
+                    const dist = customDist || userLocation.distance || 5;
+                    if (userLocation.depots && userLocation.depots.length > 0 && !customDist) {
+                        try {
+                            const withDepots = await postMarketApi('searchByIdentity', { ...base, latitude: userLocation.lat, longitude: userLocation.lng, distance: dist, depots: userLocation.depots });
+                            if (withDepots?.content?.length > 0) return withDepots;
+                        } catch {}
+                    }
+                    return await postMarketApi('searchByIdentity', { ...base, latitude: userLocation.lat, longitude: userLocation.lng, distance: dist });
+                }
+                return await postMarketApi('searchByIdentity', base);
             }
 
             async function fetchOpenFoodFacts(barcode) {
@@ -1872,6 +2049,9 @@
                 let marketData = null;
                 try {
                     let json = await queryMarketIdentity(barcode, "barcode", true);
+                    if ((!json.content || json.content.length === 0) && userLocation.lat !== null && (userLocation.distance || 5) < 25) {
+                        json = await queryMarketIdentity(barcode, "barcode", true, 25);
+                    }
                     if ((!json.content || json.content.length === 0) && userLocation.lat !== null) {
                         json = await queryMarketIdentity(barcode, "barcode", false);
                     }
@@ -1898,6 +2078,9 @@
                 let fellBack = false;
                 try {
                     json = await queryMarketSearch(keywords, 24, true);
+                    if ((!json.content || json.content.length === 0) && userLocation.lat !== null && (userLocation.distance || 5) < 25) {
+                        json = await queryMarketSearch(keywords, 24, true, 25);
+                    }
                     if ((!json.content || json.content.length === 0) && userLocation.lat !== null) {
                         json = await queryMarketSearch(keywords, 24, false);
                         fellBack = true;
@@ -1929,7 +2112,6 @@
                 playBeep(true);
             }
 
-            // Konum aktifse ürünün şubelerini yerel mesafeye göre süz (yoksa tümünü kullan)
             function getEffectiveDepotsForCard(depots) {
                 if (!depots || depots.length === 0) return [];
                 if (userLocation.lat === null || userLocation.lng === null) return depots;
@@ -1981,7 +2163,6 @@
                     const minDepot = sortedDepots[0];
                     const minPrice = minDepot ? parseFloat(minDepot.price).toFixed(2) : null;
 
-                    // Benzersiz market logolarını yan yana topla
                     const seenMarketKeys = new Set();
                     const marketBadgesHtml = [];
                     sortedDepots.forEach(d => {
@@ -1997,7 +2178,6 @@
                         }
                     });
 
-                    // Boykot durumu (sağ üst köşe rozeti)
                     const bStatus = getBoycottStatus(item.brand, item.title);
                     let cornerBadgeHtml = '';
                     let statusClass = '';
@@ -2055,10 +2235,12 @@
 
                 if (item.id) {
                     try {
-                        const res = await queryMarketIdentity(item.id, "id", true);
+                        let res = await queryMarketIdentity(item.id, "id", true);
+                        if ((!res.content || res.content.length === 0) && userLocation.lat !== null && (userLocation.distance || 5) < 25) {
+                            res = await queryMarketIdentity(item.id, "id", true, 25);
+                        }
                         if (res.content && res.content.length > 0) {
                             const idItem = res.content[0];
-                            // /search'ten gelen yerel şubelerle /searchByIdentity şubelerini depotId bazında birleştir
                             const mergedMap = new Map();
                             (item.productDepotInfoList || []).forEach(d => mergedMap.set(d.depotId || `${d.marketAdi}_${d.depotName}`, d));
                             (idItem.productDepotInfoList || []).forEach(d => mergedMap.set(d.depotId || `${d.marketAdi}_${d.depotName}`, d));
@@ -2122,7 +2304,8 @@
 
                 const activeList = currentProductContext.visibleDepots || currentProductContext.depots || [];
                 const cheapestVal = activeList.length > 0 ? Math.min(...activeList.map(d => parseFloat(d.price))) : null;
-                let speechTxt = `${brand} ${name}. `;
+                const speechTitle = buildSpeechProductTitle(brand, name);
+                let speechTxt = `${speechTitle}. `;
                 if (cheapestVal) speechTxt += `En ucuz fiyat ${formatPriceForSpeech(cheapestVal)}.`;
                 setTimeout(() => speak(speechTxt), 400);
             }
@@ -2190,9 +2373,7 @@
                     const far = allDepots.filter(d => d._distKm === null || d._distKm > radius);
 
                     if (nearby.length > 0) {
-                        if (!showAllFarDepots) {
-                            displayDepots = nearby;
-                        }
+                        if (!showAllFarDepots) displayDepots = nearby;
                         if (far.length > 0) {
                             noteText.textContent = showAllFarDepots
                                 ? `Tüm şubeler (${allDepots.length}) gösteriliyor.`
@@ -2202,10 +2383,9 @@
                             noteBanner.classList.add('visible');
                         }
                     } else {
-                        // Seçilen yarıçapta şube yoksa en yakın şubeleri mesafeye göre sıralayıp en yakın 12 şubeyi göster
                         const sortedByDist = [...allDepots].sort((a, b) => (a._distKm ?? Infinity) - (b._distKm ?? Infinity));
                         displayDepots = showAllFarDepots ? allDepots : sortedByDist.slice(0, 12);
-                        noteText.textContent = `${radius} km içinde şube bulunamadı. En yakın şubeler mesafeye göre gösteriliyor.`;
+                        noteText.textContent = `${radius} km içinde şube bulunamadı. En yakın şubeler mesafeye göre sıralandı.`;
                         if (allDepots.length > 12) {
                             btnToggleFar.textContent = showAllFarDepots ? 'En Yakın 12 Şube' : `Tümünü Göster (${allDepots.length})`;
                             btnToggleFar.style.display = 'inline-block';
@@ -2262,8 +2442,10 @@
                     const mkKey = getMarketKey(p.marketAdi);
                     const distStr = formatDistance(p._distKm);
                     const timeStr = formatRelativeTime(p.indexTime);
-                    const hasMapCoords = p.latitude != null && p.longitude != null;
-                    const mapUrl = hasMapCoords ? `https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}` : '';
+                    const pLat = parseValidCoord(p.latitude);
+                    const pLng = parseValidCoord(p.longitude);
+                    const hasMapCoords = pLat !== null && pLng !== null;
+                    const mapUrl = hasMapCoords ? `https://www.google.com/maps/search/?api=1&query=${pLat},${pLng}` : '';
 
                     priceList.innerHTML += `
                         <div class="price-item ${isCheap ? 'cheapest' : ''}">
@@ -2271,7 +2453,7 @@
                                 <div class="market-top-row">
                                     ${mkKey ? `<img src="${MARKET_LOGOS[mkKey]}" class="market-logo" alt="${escapeHtml(p.marketAdi)}">` : `<span style="font-weight:700;">${escapeHtml(p.marketAdi)}</span>`}
                                     ${p.depotName ? `<span class="branch-name">• ${escapeHtml(p.depotName)}</span>` : ''}
-                                    ${p.percentage ? `<span class="badge-discount">%${escapeHtml(p.percentage)} İndirim</span>` : ''}
+                                    ${p.discount === true ? `<span class="badge-discount">İndirimde</span>` : ''}
                                 </div>
                                 <div class="market-sub-row">
                                     ${distStr ? `<span>📍 ${distStr}</span>` : ''}
